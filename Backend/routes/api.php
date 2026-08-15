@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PublicContentController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,9 +28,18 @@ Route::post('/contact', [ContactController::class, 'store']);
 
 /*
 |--------------------------------------------------------------------------
+| Admin Auth Route
+|--------------------------------------------------------------------------
+*/
+Route::post('/admin/login', [AuthController::class, 'login']);
+
+
+/*
+|--------------------------------------------------------------------------
 | Protected Admin Routes (Requires Sanctum Token Authentication)
 |--------------------------------------------------------------------------
 */
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+

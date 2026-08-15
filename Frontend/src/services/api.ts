@@ -135,3 +135,43 @@ export async function submitContactMessage(payload: ContactPayload) {
     };
   }
 }
+
+
+/**
+ * Authenticate Admin Login via Laravel Backend API
+ */
+export async function adminLogin(username: string, password: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.status === 'success') {
+      return {
+        success: true,
+        message: result.message || 'Login berhasil!',
+        user: result.user,
+      };
+    } else {
+      return {
+        success: false,
+        message: result.message || 'Username atau password salah!',
+      };
+    }
+  } catch (error) {
+    console.error('[API Service] Error connecting to Laravel backend:', error);
+    return {
+      success: false,
+      message: 'Tidak dapat terhubung ke server database Backend Laravel. Mohon pastikan Laragon / server Laravel aktif!',
+    };
+  }
+}
+
+

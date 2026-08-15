@@ -167,5 +167,16 @@ class DatabaseSeeder extends Seeder
         foreach ($testimonials as $tm) {
             Testimonial::create($tm);
         }
+
+        // 7. Default Admin User (If table is empty)
+        if (\App\Models\User::count() === 0) {
+            \App\Models\User::create([
+                'name' => 'admin',
+                'email' => 'admin@tjkt.sch.id',
+                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+            ]);
+        }
     }
 }
+
+

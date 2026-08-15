@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Lock, User, ShieldCheck, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { adminLogin } from "../services/api";
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
@@ -13,24 +14,32 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackTo
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!username.trim() || !password.trim()) {
+      setError("Username dan password tidak boleh kosong.");
+      return;
+    }
+
     setLoading(true);
 
-    setTimeout(() => {
-      if (
-        (username === "FaisalNoxi" && password === "Amirfaisal26") ||
-        (username === "AdminTJKT" && password === "Instruktur")
-      ) {
+    try {
+      const result = await adminLogin(username, password);
+
+      if (result.success) {
         localStorage.setItem("tjkt_admin_logged", "true");
         localStorage.setItem("tjkt_admin_user", username);
         onLoginSuccess();
       } else {
-        setError("Username atau password salah! Silakan coba lagi.");
+        setError(result.message || "Username atau password salah! Silakan coba lagi.");
       }
+    } catch (err) {
+      setError("Terjadi kesalahan saat verifikasi login.");
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   return (
@@ -109,7 +118,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackTo
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 cursor-pointer flex items-center justify-center"
+            className="w-full mt-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 cursor-pointer flex items-center justify-center disabled:opacity-50"
           >
             {loading ? "Memverifikasi..." : "Masuk ke Dashboard →"}
           </button>
