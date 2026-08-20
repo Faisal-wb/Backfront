@@ -203,19 +203,19 @@ export async function loadSiteContentAsync(): Promise<SiteContentData> {
   return loadSiteContent();
 }
 
-export async function saveSiteContent(data: SiteContentData): Promise<boolean> {
+export async function saveSiteContent(data: SiteContentData): Promise<{success: boolean, data?: SiteContentData}> {
   // Save to API
   const result = await saveSiteContentApi(data);
-  if (result.success) {
+  if (result.success && result.data) {
     // Also update local storage as a fallback cache
     try {
-      localStorage.setItem(SITE_CONTENT_KEY, JSON.stringify(data));
+      localStorage.setItem(SITE_CONTENT_KEY, JSON.stringify(result.data));
     } catch (e) {
       console.warn("Gagal update local cache:", e);
     }
-    return true;
+    return { success: true, data: result.data };
   }
-  return false;
+  return { success: false };
 }
 
 interface AdminSiteContentProps {
@@ -266,15 +266,16 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
   const handleSave = async () => {
     setIsSaving(true);
-    const success = await saveSiteContent(formData);
+    const result = await saveSiteContent(formData);
     setIsSaving(false);
     
-    if (success) {
-      onUpdateContent(formData);
+    if (result.success && result.data) {
+      onUpdateContent(result.data);
+      setFormData(prev => ({ ...prev, ...result.data }));
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } else {
-      alert("Gagal menyimpan data ke server. Pastikan session admin valid.");
+      alert("Gagal menyimpan data ke server. Pastikan ukuran file gambar tidak terlalu besar (maks ~2MB).");
     }
   };
 
