@@ -49,4 +49,19 @@ class AuthController extends Controller
             'message' => 'Username atau password salah! Silakan coba lagi.'
         ], 401);
     }
+
+    /**
+     * Admin logout.
+     */
+    public function logout(Request $request)
+    {
+        if ($request->user() && method_exists($request->user(), 'currentAccessToken')) {
+            $request->user()->currentAccessToken()->delete();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logout berhasil!'
+        ]);
+    }
 }

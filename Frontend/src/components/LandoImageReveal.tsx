@@ -78,6 +78,13 @@ export const LandoImageReveal: React.FC<LandoImageRevealProps> = ({
       // Smoothly expand/collapse liquid mask size on hover enter/leave
       maskRadius.current += (targetRadius - maskRadius.current) * 0.14;
 
+      // ⚡ Stop animation loop if idle and mask is closed
+      if (!isHovered && maskRadius.current < 0.005) {
+        maskRadius.current = 0;
+        setPathData("");
+        return;
+      }
+
       // Smooth lerp main cursor position
       currentPos.current.x += (targetPos.current.x - currentPos.current.x) * 0.12;
       currentPos.current.y += (targetPos.current.y - currentPos.current.y) * 0.12;

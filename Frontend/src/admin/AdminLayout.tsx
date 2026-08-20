@@ -4,9 +4,9 @@ import { AdminDashboard } from "./AdminDashboard";
 import { AdminTeachers, TeacherData } from "./AdminTeachers";
 import { AdminAchievements, AchievementData } from "./AdminAchievements";
 import { AdminGallery, GalleryItem } from "./AdminGallery";
-import { AdminMessages, MessageItemData } from "./AdminMessages";
+
 import { AdminSiteContent, SiteContentData, loadSiteContent } from "./AdminSiteContent";
-import logoLT3 from "../assets/logo_lt3.png";
+import logoLT3 from "../assets/logo_lt3.webp";
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -17,7 +17,7 @@ interface AdminLayoutProps {
   onUpdateAchievements: (achievements: AchievementData[]) => void;
   defaultGallery: GalleryItem[];
   onSyncGallery: (gallery: GalleryItem[]) => void;
-  messages: MessageItemData[];
+
   dbStatus: "connected" | "offline";
   siteContent?: SiteContentData;
   onUpdateSiteContent?: (data: SiteContentData) => void;
@@ -32,12 +32,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   onUpdateAchievements,
   defaultGallery,
   onSyncGallery,
-  messages,
+
   dbStatus,
   siteContent,
   onUpdateSiteContent,
 }) => {
-  const [activeTab, setActiveTab] = useState<"dashboard" | "navigasi" | "beranda" | "tentang" | "kompetensi" | "teachers" | "achievements" | "gallery" | "messages" | "kontak" | "siteContent">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "navigasi" | "beranda" | "tentang" | "kompetensi" | "teachers" | "achievements" | "gallery" | "kontak" | "siteContent">("dashboard");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   // Theme state: 'light' by default, stored in localStorage
@@ -52,6 +52,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   };
 
   const isDark = theme === "dark";
+
+  const activeSiteContent = useMemo(() => {
+    return siteContent || loadSiteContent();
+  }, [siteContent]);
 
   const galleryCount = useMemo(() => {
     try {
@@ -74,7 +78,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { id: "gallery", label: "Galeri Foto", icon: ImageIcon },
     { id: "teachers", label: "Data Guru", icon: Users, badge: teachers.length },
     { id: "kontak", label: "Kontak & Sosmed", icon: PhoneCall },
-    { id: "messages", label: "Pesan Masuk", icon: Mail, badge: messages.length },
+
   ];
 
   return (
@@ -326,7 +330,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
           {(activeTab === "navigasi" || activeTab === "beranda" || activeTab === "tentang" || activeTab === "kompetensi" || activeTab === "kontak" || activeTab === "siteContent") && (
             <AdminSiteContent
-              content={siteContent || loadSiteContent()}
+              content={activeSiteContent}
               onUpdateContent={onUpdateSiteContent || (() => {})}
               section={activeTab === "siteContent" ? "navigasi" : activeTab as any}
               theme={theme}
@@ -349,9 +353,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             />
           )}
 
-          {activeTab === "messages" && (
-            <AdminMessages messages={messages} theme={theme} />
-          )}
+
         </main>
       </div>
     </div>

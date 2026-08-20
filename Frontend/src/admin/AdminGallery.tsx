@@ -141,8 +141,6 @@ export const AdminGallery: React.FC<AdminGalleryProps> = ({
             items.push({ url: "", alt: m.alt });
           }
         }
-        // Update state incrementally so images appear as they load
-        if (!cancelled) setResolved([...items]);
       }
       if (!cancelled) {
         setResolved(items);

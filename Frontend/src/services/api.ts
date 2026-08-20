@@ -1,6 +1,6 @@
 // React Frontend API Integration Service with Laravel Backend & Fallback
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_BASE_URL = 'https://lt3tjkt.smkthpati.sch.id/api';
 
 export interface StatItem {
   id?: number;
@@ -170,6 +170,30 @@ export async function adminLogin(username: string, password: string) {
     return {
       success: false,
       message: 'Tidak dapat terhubung ke server database Backend Laravel. Mohon pastikan Laragon / server Laravel aktif!',
+    };
+  }
+}
+
+/**
+ * Admin Logout via Laravel Backend API
+ */
+export async function adminLogout() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/logout`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+    const result = await response.json();
+    return {
+      success: response.ok,
+      message: result.message || 'Logout berhasil!',
+    };
+  } catch (error) {
+    return {
+      success: true,
+      message: 'Logout berhasil (lokal)',
     };
   }
 }

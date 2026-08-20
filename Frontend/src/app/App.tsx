@@ -8,7 +8,7 @@ import {
   Layers, Trophy, Shield, Code, Sun, Moon,
   ChevronLeft, ChevronRight, Terminal
 } from "lucide-react";
-import { fetchPublicContent } from "../services/api";
+import { fetchPublicContent, adminLogout } from "../services/api";
 import { AdminLogin } from "../admin/AdminLogin";
 import { AdminLayout } from "../admin/AdminLayout";
 import { L3Preloader } from "../components/L3Preloader";
@@ -16,18 +16,18 @@ import { LandoImageReveal } from "../components/LandoImageReveal";
 import { loadSiteContent, loadSiteContentAsync, SiteContentData } from "../admin/AdminSiteContent";
 
 
-import logoLT3 from "../assets/logo_lt3.png";
+import logoLT3 from "../assets/logo_lt3.webp";
 
-// â”€â”€â”€ LOCAL IMAGE IMPORTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LOCAL IMAGE IMPORTS ───────────────────────────────────────────────────
 
-import imgTHP09635 from "../assets/TKJ/THP09635.jpg";
-import imgTHP09712 from "../assets/TKJ/THP09712.jpg";
-import imgTHP09732 from "../assets/TKJ/THP09732.jpg";
-import imgTHP09750 from "../assets/TKJ/THP09750.jpg";
-import imgTHP09765 from "../assets/TKJ/THP09765.jpg";
-import imgTHP09774 from "../assets/TKJ/THP09774.jpg";
-import imgTHP09787 from "../assets/TKJ/THP09787.jpg";
-import imgTHP09790 from "../assets/TKJ/THP09790.jpg";
+import imgTHP09635 from "../assets/TKJ/THP09635.webp";
+import imgTHP09712 from "../assets/TKJ/THP09712.webp";
+import imgTHP09732 from "../assets/TKJ/THP09732.webp";
+import imgTHP09750 from "../assets/TKJ/THP09750.webp";
+import imgTHP09765 from "../assets/TKJ/THP09765.webp";
+import imgTHP09774 from "../assets/TKJ/THP09774.webp";
+import imgTHP09787 from "../assets/TKJ/THP09787.webp";
+import imgTHP09790 from "../assets/TKJ/THP09790.webp";
 
 // â”€â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -247,28 +247,38 @@ function WindowCard({ title, accent, children }: { title: string; accent?: strin
 }
 
 
-// â”€â”€â”€ LANDO NORRIS INSPIRED COMPONENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 function TopScrollProgress() {
   const [scrollWidth, setScrollWidth] = useState(0);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      setScrollWidth(scrolled);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+          setScrollWidth(scrolled);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-[3px] bg-transparent pointer-events-none">
       <div
-        className="h-full bg-gradient-to-r from-red-600 via-red-500 to-amber-500 shadow-[0_0_12px_#ef4444] transition-all duration-150 ease-out"
-        style={{ width: `${scrollWidth}%` }}
+        className="h-full bg-gradient-to-r from-red-600 via-red-500 to-amber-500 shadow-[0_0_12px_#ef4444]"
+        style={{
+          transform: `scaleX(${scrollWidth / 100})`,
+          transformOrigin: 'left',
+          willChange: 'transform',
+          transition: 'transform 150ms ease-out'
+        }}
       />
     </div>
   );
@@ -472,6 +482,53 @@ function FluidCanvasCursor() {
 
     const particles: TrailParticle[] = [];
     let prevMouse = { x: -100, y: -100 };
+    let isLoopRunning = false;
+
+    const startLoop = () => {
+      if (!isLoopRunning) {
+        isLoopRunning = true;
+        animId = requestAnimationFrame(render);
+      }
+    };
+
+    const render = () => {
+      if (particles.length === 0) {
+        ctx.clearRect(0, 0, width, height);
+        isLoopRunning = false;
+        return;
+      }
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Render crisp solid red liquid droplets (no stroke / no blur / no outline)
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life++;
+
+        const progress = p.life / p.maxLife;
+        // Fast shrink & quick fade out
+        const currentRadius = Math.max(0, p.radius * (1 - Math.pow(progress, 1.8)));
+        const currentAlpha = p.alpha * (1 - Math.pow(progress, 1.2));
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.85; // Liquid surface tension deceleration
+        p.vy *= 0.85;
+
+        if (progress >= 1 || currentAlpha <= 0.02 || currentRadius <= 0.4) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        // Draw solid red liquid droplet (#ef4444)
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(239, 68, 68, ${currentAlpha.toFixed(3)})`;
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
 
     const onMouseMove = (e: MouseEvent) => {
       const mouseX = e.clientX;
@@ -508,47 +565,13 @@ function FluidCanvasCursor() {
               maxLife: 10 + Math.floor(Math.random() * 6),
             });
           }
+          startLoop();
         }
       }
       prevMouse = { x: mouseX, y: mouseY };
     };
 
     window.addEventListener("mousemove", onMouseMove);
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Render crisp solid red liquid droplets (no stroke / no blur / no outline)
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.life++;
-
-        const progress = p.life / p.maxLife;
-        // Fast shrink & quick fade out
-        const currentRadius = Math.max(0, p.radius * (1 - Math.pow(progress, 1.8)));
-        const currentAlpha = p.alpha * (1 - Math.pow(progress, 1.2));
-
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.85; // Liquid surface tension deceleration
-        p.vy *= 0.85;
-
-        if (progress >= 1 || currentAlpha <= 0.02 || currentRadius <= 0.4) {
-          particles.splice(i, 1);
-          continue;
-        }
-
-        // Draw solid red liquid droplet (#ef4444)
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(239, 68, 68, ${currentAlpha.toFixed(3)})`;
-        ctx.fill();
-      }
-
-      animId = requestAnimationFrame(render);
-    };
-
-    render();
 
     return () => {
       window.removeEventListener("resize", onResize);
@@ -625,15 +648,20 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
     [activeIdx, animating]
   );
 
+  const activeIdxRef = React.useRef(activeIdx);
+  activeIdxRef.current = activeIdx;
+  const switchToRef = React.useRef(switchTo);
+  switchToRef.current = switchTo;
+
   // Autoplay interval every 4 seconds (pauses on hover)
   React.useEffect(() => {
     if (items.length <= 1 || isHovered) return;
     const interval = setInterval(() => {
-      const nextIdx = (activeIdx + 1) % items.length;
-      switchTo(nextIdx);
+      const nextIdx = (activeIdxRef.current + 1) % items.length;
+      switchToRef.current(nextIdx);
     }, 4000);
     return () => clearInterval(interval);
-  }, [activeIdx, items.length, isHovered, switchTo]);
+  }, [items.length, isHovered]);
 
   // Scroll ONLY the thumbnail strip container div (without jumping/scrolling the main window)
   React.useEffect(() => {
@@ -891,7 +919,9 @@ export default function App() {
   });
 
   // Admin view state
-  const [isAdminView, setIsAdminView] = useState(() => typeof window !== "undefined" && window.location.hash === "#admin");
+  const [isAdminView, setIsAdminView] = useState(() =>
+    typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.hash === "#admin")
+  );
   const [isAdminLogged, setIsAdminLogged] = useState(() => typeof window !== "undefined" && localStorage.getItem("tjkt_admin_logged") === "true");
 
   // Site Content & Navigation state (editable from Admin CMS)
@@ -934,11 +964,17 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setIsAdminView(window.location.hash === "#admin");
+    const handleLocationChange = () => {
+      const isAdmin = window.location.pathname.startsWith("/admin") || window.location.hash === "#admin";
+      setIsAdminView(isAdmin);
     };
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    handleLocationChange();
+    window.addEventListener("hashchange", handleLocationChange);
+    window.addEventListener("popstate", handleLocationChange);
+    return () => {
+      window.removeEventListener("hashchange", handleLocationChange);
+      window.removeEventListener("popstate", handleLocationChange);
+    };
   }, []);
 
 
@@ -1038,29 +1074,49 @@ export default function App() {
   }, [isAdminView]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled((prev) => {
+            const isScrolled = window.scrollY > 60;
+            return prev !== isScrolled ? isScrolled : prev;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     const sectionIds = NAV_LINKS.map(l => l.href.substring(1));
+    let ticking = false;
+
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 180;
-      let current = "home";
-      for (const id of sectionIds) {
-        if (id === "home") continue;
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            current = id;
-            break;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollPos = window.scrollY + 180;
+          let current = "home";
+          for (const id of sectionIds) {
+            if (id === "home") continue;
+            const el = document.getElementById(id);
+            if (el) {
+              const top = el.offsetTop;
+              const height = el.offsetHeight;
+              if (scrollPos >= top && scrollPos < top + height) {
+                current = id;
+                break;
+              }
+            }
           }
-        }
+          setActiveSection((prev) => (prev !== current ? current : prev));
+          ticking = false;
+        });
+        ticking = true;
       }
-      setActiveSection(current);
     };
 
     handleScroll();
@@ -1076,6 +1132,7 @@ export default function App() {
         <AdminLogin
           onLoginSuccess={() => setIsAdminLogged(true)}
           onBackToSite={() => {
+            window.history.pushState(null, "", "/");
             window.location.hash = "";
             setIsAdminView(false);
           }}
@@ -1085,10 +1142,13 @@ export default function App() {
     return (
       <AdminLayout
         onLogout={() => {
+          adminLogout();
           localStorage.removeItem("tjkt_admin_logged");
           setIsAdminLogged(false);
+          window.history.pushState(null, "", "/admin");
         }}
         onBackToSite={() => {
+          window.history.pushState(null, "", "/");
           window.location.hash = "";
           setIsAdminView(false);
         }}
@@ -1108,7 +1168,6 @@ export default function App() {
         }}
         defaultGallery={GALLERY}
         onSyncGallery={(g) => setDynamicGallery(g)}
-        messages={dynamicMessages}
         dbStatus={dbStatus}
         siteContent={siteContent}
         onUpdateSiteContent={setSiteContent}
@@ -1395,6 +1454,7 @@ export default function App() {
                   <img
                     src={siteContent.aboutImage1 || imgTHP09750}
                     alt="Siswa TJKT sesi coding workshop"
+                    loading="lazy"
                     className="w-full object-cover"
                     style={{ height: "420px" }}
                   />
@@ -1415,6 +1475,7 @@ export default function App() {
                   <img
                     src={siteContent.aboutImage2 || imgTHP09774}
                     alt="Kabel jaringan fiber optik"
+                    loading="lazy"
                     className="w-full h-full object-cover opacity-90 dark:opacity-80"
                   />
                   <div className="absolute inset-0 flex items-end p-2 bg-gradient-to-t from-black/80 to-transparent">
@@ -1491,6 +1552,7 @@ export default function App() {
                     <img
                       src={siteContent.kompetensiImageProgramming || imgTHP09712}
                       alt="Lab komputer pemrograman"
+                      loading="lazy"
                       className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#0e0e10]" />
@@ -1528,6 +1590,7 @@ export default function App() {
                     <img
                       src={siteContent.kompetensiImageNetworking || imgTHP09790}
                       alt="Lab jaringan Cisco MikroTik"
+                      loading="lazy"
                       className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#0e0e10]" />
@@ -1978,7 +2041,17 @@ export default function App() {
                 © 2026 TJKT SMK Tunas Harapan Pati · All rights reserved
               </p>
               <div className="flex items-center gap-4 text-zinc-400 text-[11px]" style={{ fontFamily: "'Inter', sans-serif" }}>
-
+                <a
+                  href="/admin"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.history.pushState(null, "", "/admin");
+                    setIsAdminView(true);
+                  }}
+                  className="hover:text-red-400 transition-colors cursor-pointer"
+                >
+                  Admin Portal
+                </a>
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                 <span>Teknik Jaringan Komputer dan Telekomunikasi</span>
               </div>

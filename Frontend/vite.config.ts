@@ -30,6 +30,17 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router'],
+          'vendor-ui': ['@mui/material', '@emotion/react', '@emotion/styled', 'lucide-react'],
+          'vendor-motion': ['motion', 'lenis'],
+        },
+      },
+    },
+  },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],

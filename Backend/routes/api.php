@@ -32,6 +32,7 @@ Route::post('/contact', [ContactController::class, 'store']);
 |--------------------------------------------------------------------------
 */
 Route::post('/admin/login', [AuthController::class, 'login']);
+Route::post('/admin/logout', [AuthController::class, 'logout']);
 
 
 /*

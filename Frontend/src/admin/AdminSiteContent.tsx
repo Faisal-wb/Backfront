@@ -641,7 +641,8 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
                 <div className="h-40 rounded-xl overflow-hidden border border-zinc-700/50 bg-black/40 relative group">
                   <img
-                    src={formData.heroImage1 || "/src/assets/TKJ/THP09774.jpg"}
+                    decoding="async" loading="lazy"
+                    src={formData.heroImage1 || "/src/assets/TKJ/THP09774.webp"}
                     alt="Preview Gambar 1"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -671,18 +672,7 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider opacity-75">Atau Input URL Foto</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.heroImage1 || ""}
-                    onChange={(e) => setFormData({ ...formData, heroImage1: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border text-xs font-mono ${
-                      isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300 text-slate-800"
-                    }`}
-                  />
-                </div>
+
               </div>
 
               {/* Gambar 2 (Efek Liquid Reveal / LT3) */}
@@ -701,7 +691,8 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
                 <div className="h-40 rounded-xl overflow-hidden border border-zinc-700/50 bg-black/40 relative group">
                   <img
-                    src={formData.heroImage2 || "/src/assets/TKJ/THP09790.jpg"}
+                    decoding="async" loading="lazy"
+                    src={formData.heroImage2 || "/src/assets/TKJ/THP09790.webp"}
                     alt="Preview Gambar LT3"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -731,18 +722,7 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider opacity-75">Atau Input URL Foto</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.heroImage2 || ""}
-                    onChange={(e) => setFormData({ ...formData, heroImage2: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border text-xs font-mono ${
-                      isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300 text-slate-800"
-                    }`}
-                  />
-                </div>
+
               </div>
             </div>
           </div>
@@ -924,7 +904,8 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
                 <div className="h-40 rounded-xl overflow-hidden border border-zinc-700/50 bg-black/40 relative group">
                   <img
-                    src={formData.aboutImage1 || "/src/assets/TKJ/THP09750.jpg"}
+                    decoding="async" loading="lazy"
+                    src={formData.aboutImage1 || "/src/assets/TKJ/THP09750.webp"}
                     alt="Preview Gambar Utama Tentang"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -951,18 +932,7 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider opacity-75">Atau Input URL Foto</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.aboutImage1 || ""}
-                    onChange={(e) => setFormData({ ...formData, aboutImage1: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border text-xs font-mono ${
-                      isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300 text-slate-800"
-                    }`}
-                  />
-                </div>
+
               </div>
 
               {/* Gambar 2 (Foto Kecil Offset) */}
@@ -981,7 +951,8 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
                 <div className="h-40 rounded-xl overflow-hidden border border-zinc-700/50 bg-black/40 relative group">
                   <img
-                    src={formData.aboutImage2 || "/src/assets/TKJ/THP09774.jpg"}
+                    decoding="async" loading="lazy"
+                    src={formData.aboutImage2 || "/src/assets/TKJ/THP09774.webp"}
                     alt="Preview Gambar Kecil Tentang"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1008,18 +979,7 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider opacity-75">Atau Input URL Foto</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.aboutImage2 || ""}
-                    onChange={(e) => setFormData({ ...formData, aboutImage2: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border text-xs font-mono ${
-                      isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300 text-slate-800"
-                    }`}
-                  />
-                </div>
+
               </div>
             </div>
           </div>
@@ -1126,7 +1086,8 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
                 <div className="h-40 rounded-xl overflow-hidden border border-zinc-700/50 bg-black/40 relative group">
                   <img
-                    src={formData.kompetensiImageProgramming || "/src/assets/TKJ/THP09712.jpg"}
+                    decoding="async" loading="lazy"
+                    src={formData.kompetensiImageProgramming || "/src/assets/TKJ/THP09712.webp"}
                     alt="Preview Gambar Programming"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1153,18 +1114,7 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider opacity-75">Atau Input URL Foto</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.kompetensiImageProgramming || ""}
-                    onChange={(e) => setFormData({ ...formData, kompetensiImageProgramming: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border text-xs font-mono ${
-                      isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300 text-slate-800"
-                    }`}
-                  />
-                </div>
+
               </div>
 
               {/* Card 2: Networking Image */}
@@ -1183,7 +1133,8 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
                 <div className="h-40 rounded-xl overflow-hidden border border-zinc-700/50 bg-black/40 relative group">
                   <img
-                    src={formData.kompetensiImageNetworking || "/src/assets/TKJ/THP09790.jpg"}
+                    decoding="async" loading="lazy"
+                    src={formData.kompetensiImageNetworking || "/src/assets/TKJ/THP09790.webp"}
                     alt="Preview Gambar Networking"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1210,18 +1161,7 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider opacity-75">Atau Input URL Foto</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.kompetensiImageNetworking || ""}
-                    onChange={(e) => setFormData({ ...formData, kompetensiImageNetworking: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border text-xs font-mono ${
-                      isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300 text-slate-800"
-                    }`}
-                  />
-                </div>
+
               </div>
             </div>
           </div>
