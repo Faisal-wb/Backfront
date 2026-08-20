@@ -267,6 +267,7 @@ export async function saveSiteContentApi(data: any) {
       return {
         success: true,
         message: result.message || 'Berhasil menyimpan pengaturan!',
+        data: result.data
       };
     } else {
       return {

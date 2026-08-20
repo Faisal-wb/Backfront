@@ -64,7 +64,7 @@ class SiteSettingController extends Controller
                 Storage::disk('public')->put($imageName, base64_decode($image));
                 
                 // Update payload with URL
-                $payload[$field] = config('app.url') . '/storage/' . $imageName;
+                $payload[$field] = '/storage/' . $imageName;
             }
         }
 
@@ -75,7 +75,8 @@ class SiteSettingController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Site content updated successfully'
+            'message' => 'Site content updated successfully',
+            'data' => $payload
         ]);
     }
 }
