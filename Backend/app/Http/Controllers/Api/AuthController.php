@@ -27,9 +27,12 @@ class AuthController extends Controller
             $user = User::where('name', $username)->orWhere('email', $username)->first();
 
             if ($user && Hash::check($password, $user->password)) {
+                $token = $user->createToken('admin-token')->plainTextToken;
+
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Login berhasil!',
+                    'token' => $token,
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->name,

@@ -6,11 +6,14 @@ use App\Http\Controllers\Api\PublicContentController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\AuthController;
 
+use App\Http\Controllers\Api\SiteSettingController;
+
 /*
 |--------------------------------------------------------------------------
 | Public API Routes (Read-Only - No Login Required)
 |--------------------------------------------------------------------------
 */
+Route::get('/site-content', [SiteSettingController::class, 'index']);
 Route::get('/content', [PublicContentController::class, 'index']);
 Route::get('/stats', [PublicContentController::class, 'stats']);
 Route::get('/slides', [PublicContentController::class, 'slides']);
@@ -40,7 +43,10 @@ Route::post('/admin/logout', [AuthController::class, 'logout']);
 | Protected Admin Routes (Requires Sanctum Token Authentication)
 |--------------------------------------------------------------------------
 */
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::post('/site-content', [SiteSettingController::class, 'update']);
+});
 

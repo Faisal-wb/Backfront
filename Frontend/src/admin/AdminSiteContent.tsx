@@ -4,6 +4,7 @@ import {
   Link, Globe, Sparkles, Layers, MessageSquare, ShieldCheck, RefreshCw, Type,
   Home, Info, Cpu, PhoneCall, Mail, Server, Radio, Cloud, Shield, Share2, MapPin, Phone
 } from "lucide-react";
+import { saveSiteContentApi, fetchSiteContentApi } from "../services/api";
 
 export interface NavItem {
   id: string;
@@ -192,38 +193,29 @@ export function loadSiteContent(): SiteContentData {
   return DEFAULT_SITE_CONTENT;
 }
 
-/** Muat site content + gambar dari IndexedDB secara async */
+/** Muat site content dari API secara async */
 export async function loadSiteContentAsync(): Promise<SiteContentData> {
-  const base = loadSiteContent();
-  const result: SiteContentData = { ...base };
-  for (const field of IMG_FIELDS) {
-    const idbKey = `site_${field}`;
-    const val = await idbGet(idbKey).catch(() => undefined);
-    if (val) (result as any)[field] = val;
+  const result = await fetchSiteContentApi();
+  if (result.success && result.data) {
+    return { ...DEFAULT_SITE_CONTENT, ...result.data };
   }
-  return result;
+  // Fallback to local storage if API fails
+  return loadSiteContent();
 }
 
-export function saveSiteContent(data: SiteContentData): boolean {
-  // Strip gambar base64 besar dari data sebelum disimpan ke localStorage
-  const slim: any = { ...data };
-  for (const field of IMG_FIELDS) {
-    const val = slim[field];
-    if (typeof val === "string" && val.startsWith("data:")) {
-      // Simpan ke IndexedDB secara async, hapus dari localStorage payload
-      idbPut(`site_${field}`, val).catch(err =>
-        console.warn(`[SiteContent] Gagal simpan ${field} ke IDB:`, err)
-      );
-      delete slim[field]; // localStorage hanya simpan teks
+export async function saveSiteContent(data: SiteContentData): Promise<boolean> {
+  // Save to API
+  const result = await saveSiteContentApi(data);
+  if (result.success) {
+    // Also update local storage as a fallback cache
+    try {
+      localStorage.setItem(SITE_CONTENT_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.warn("Gagal update local cache:", e);
     }
-  }
-  try {
-    localStorage.setItem(SITE_CONTENT_KEY, JSON.stringify(slim));
     return true;
-  } catch (e) {
-    console.error("Gagal menyimpan site content:", e);
-    return false;
   }
+  return false;
 }
 
 interface AdminSiteContentProps {
@@ -270,11 +262,20 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
   // New About point state
   const [newPoint, setNewPoint] = useState("");
 
-  const handleSave = () => {
-    saveSiteContent(formData);
-    onUpdateContent(formData);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    const success = await saveSiteContent(formData);
+    setIsSaving(false);
+    
+    if (success) {
+      onUpdateContent(formData);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } else {
+      alert("Gagal menyimpan data ke server. Pastikan session admin valid.");
+    }
   };
 
   // Nav Handlers
@@ -392,10 +393,13 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
         <button
           onClick={handleSave}
-          className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-red-600/30 cursor-pointer"
+          disabled={isSaving}
+          className={`px-5 py-2.5 rounded-xl text-white font-bold text-xs transition-all flex items-center gap-2 shadow-lg cursor-pointer ${
+            isSaving ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-500 shadow-red-600/30"
+          }`}
         >
-          <Save size={16} />
-          Simpan Perubahan {activeSubTab.toUpperCase()}
+          {isSaving ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
+          {isSaving ? "Menyimpan..." : `Simpan Perubahan ${activeSubTab.toUpperCase()}`}
         </button>
       </div>
 

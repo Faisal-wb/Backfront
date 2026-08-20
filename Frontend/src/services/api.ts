@@ -154,6 +154,10 @@ export async function adminLogin(username: string, password: string) {
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
+      // Save token to localStorage
+      if (result.token) {
+        localStorage.setItem('tjkt_admin_token', result.token);
+      }
       return {
         success: true,
         message: result.message || 'Login berhasil!',
@@ -186,11 +190,16 @@ export async function adminLogout() {
       },
     });
     const result = await response.json();
+    
+    // Clear token
+    localStorage.removeItem('tjkt_admin_token');
+    
     return {
       success: response.ok,
       message: result.message || 'Logout berhasil!',
     };
   } catch (error) {
+    localStorage.removeItem('tjkt_admin_token');
     return {
       success: true,
       message: 'Logout berhasil (lokal)',
@@ -198,4 +207,78 @@ export async function adminLogout() {
   }
 }
 
+/**
+ * Fetch dynamic Site Content Data from Laravel API
+ */
+export async function fetchSiteContentApi() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
 
+  try {
+    const response = await fetch(`${API_BASE_URL}/site-content`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data) {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    clearTimeout(timeoutId);
+    console.warn('[API Service] Failed to fetch site content from backend:', error);
+  }
+
+  return {
+    success: false,
+    data: null,
+  };
+}
+
+/**
+ * Save Site Content Data to Laravel API
+ */
+export async function saveSiteContentApi(data: any) {
+  try {
+    const token = localStorage.getItem('tjkt_admin_token');
+    const response = await fetch(`${API_BASE_URL}/site-content`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.status === 'success') {
+      return {
+        success: true,
+        message: result.message || 'Berhasil menyimpan pengaturan!',
+      };
+    } else {
+      return {
+        success: false,
+        message: result.message || 'Gagal menyimpan pengaturan.',
+      };
+    }
+  } catch (error) {
+    console.error('[API Service] Error saving site content:', error);
+    return {
+      success: false,
+      message: 'Tidak dapat terhubung ke server untuk menyimpan data.',
+    };
+  }
+}
