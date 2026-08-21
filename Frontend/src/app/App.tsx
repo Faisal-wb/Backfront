@@ -817,13 +817,106 @@ export default function App() {
 
   // Dynamic API state loaded from Laravel MySQL & Admin Panel
   const [dbStatus, setDbStatus] = useState<"connected" | "offline">("offline");
-  const [dynamicTeachers, setDynamicTeachers] = useState<any[]>(FACULTY);
-  const [dynamicAchievements, setDynamicAchievements] = useState<any[]>(PRESTASI);
+  const [dynamicTeachers, setDynamicTeachers] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("tjkt_teachers");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 1) {
+            return parsed.map((t: any) => ({
+              ...t,
+              image: t.image && t.image.length > 150_000 ? "" : t.image
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn("[Teachers] Failed to parse localStorage:", e);
+      }
+    }
+    return FACULTY;
+  });
+
+  const [dynamicAchievements, setDynamicAchievements] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tjkt_achievements");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= PRESTASI.length) return parsed;
+        } catch (e) { }
+      }
+    }
+    return PRESTASI;
+  });
+
+  // Gallery state: dikelola sepenuhnya oleh AdminGallery via IndexedDB.
+  // Inisialisasi dengan foto HD bawaan; setelah AdminGallery mount, onSyncGallery akan dipanggil
+  // dengan foto-foto yang sudah diresolved dari IndexedDB (termasuk upload user).
   const [dynamicGallery, setDynamicGallery] = useState<any[]>(GALLERY);
 
-  const [dynamicMessages, setDynamicMessages] = useState<any[]>([
-    { name: "Siti Rahma", email: "siti@gmail.com", message: "Apakah ada informasi pendaftaran gelombang 2 PPDB TJKT?" }
-  ]);
+  // Pada mount awal, baca meta dari localStorage dan resolve foto dari IndexedDB
+  useEffect(() => {
+    const GALLERY_META_KEY = "tjkt_gallery_meta";
+    const IDB_DB_NAME = "tjkt_gallery_db";
+    const IDB_STORE = "images";
+
+    function openDB(): Promise<IDBDatabase> {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(IDB_DB_NAME, 1);
+        req.onupgradeneeded = () => { req.result.createObjectStore(IDB_STORE); };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function idbGet(id: string): Promise<string | undefined> {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, "readonly");
+        const req = tx.objectStore(IDB_STORE).get(id);
+        req.onsuccess = () => resolve(req.result as string | undefined);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    (async () => {
+      try {
+        const raw = localStorage.getItem(GALLERY_META_KEY);
+        if (!raw) return; // belum ada perubahan dari admin, pakai GALLERY default
+        const metaList: { id: string; alt: string; isBuiltin?: boolean }[] = JSON.parse(raw);
+        if (!Array.isArray(metaList) || metaList.length === 0) return;
+
+        // Sequential load to avoid blocking main thread with large IndexedDB reads
+        const items: { url: string; alt: string }[] = [];
+        for (const m of metaList) {
+          if (m.isBuiltin || !m.id.startsWith("idb:")) {
+            items.push({ url: m.id, alt: m.alt });
+          } else {
+            const data = await idbGet(m.id).catch(() => undefined);
+            items.push({ url: data || "", alt: m.alt });
+          }
+        }
+        const valid = items.filter((i) => !!i.url);
+        if (valid.length > 0) setDynamicGallery(valid);
+      } catch (e) {
+        console.warn("[App] Gallery IDB load error:", e);
+      }
+    })();
+  }, []);
+
+
+  const [dynamicMessages, setDynamicMessages] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tjkt_messages");
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) { }
+      }
+    }
+    return [
+      { name: "Siti Rahma", email: "siti@gmail.com", message: "Apakah ada informasi pendaftaran gelombang 2 PPDB TJKT?" }
+    ];
+  });
 
   // Admin view state
   const [isAdminView, setIsAdminView] = useState(() =>
@@ -891,7 +984,6 @@ export default function App() {
       .then(res => {
         if (res && res.success && res.data) {
           setDbStatus("connected");
-          
           if (Array.isArray(res.data.teachers) && res.data.teachers.length > 0) {
             setDynamicTeachers(res.data.teachers);
           }
@@ -900,8 +992,9 @@ export default function App() {
           }
           if (Array.isArray(res.data.gallery) && res.data.gallery.length > 0) {
             const mappedGallery = res.data.gallery.map((g: any) => ({
-              url: g.image,
-              alt: g.caption || "Gallery Image"
+              id: g.id,
+              url: g.url,
+              alt: g.alt || "Gallery Image"
             }));
             setDynamicGallery(mappedGallery);
           }
@@ -1064,9 +1157,8 @@ export default function App() {
         achievements={dynamicAchievements}
         onUpdateAchievements={(a) => {
           setDynamicAchievements(a);
-          localStorage.setItem("tjkt_achievements", JSON.stringify(a));
         }}
-        defaultGallery={GALLERY}
+        defaultGallery={dynamicGallery}
         onSyncGallery={(g) => setDynamicGallery(g)}
         dbStatus={dbStatus}
         siteContent={siteContent}

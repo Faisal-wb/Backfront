@@ -190,10 +190,10 @@ export async function adminLogout() {
       },
     });
     const result = await response.json();
-    
+
     // Clear token
     localStorage.removeItem('tjkt_admin_token');
-    
+
     return {
       success: response.ok,
       message: result.message || 'Logout berhasil!',
@@ -297,74 +297,74 @@ export async function saveSiteContentApi(data: any) {
  * Admin Gallery API
  */
 export async function adminGalleryApi(method: string, id: number | null, data: FormData | object) {
-    const token = localStorage.getItem('tjkt_admin_token');
-    const url = id ? `${API_BASE_URL}/admin/gallery/${id}` : `${API_BASE_URL}/admin/gallery`;
-    
-    const headers: any = {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
+  const token = localStorage.getItem('tjkt_admin_token');
+  const url = id ? `/admin/gallery/${id}` : `/admin/gallery`;
 
-    const options: RequestInit = {
-        method,
-        headers,
-    };
+  const headers: any = {
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
 
-    if (data instanceof FormData) {
-        options.body = data;
-        // Don't set Content-Type for FormData, browser will set it with boundary
-    } else {
-        headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify(data);
-    }
+  const options: RequestInit = {
+    method,
+    headers,
+  };
 
-    const response = await fetch(url, options);
-    return await response.json();
+  if (data instanceof FormData) {
+    options.body = data;
+    // Don't set Content-Type for FormData, browser will set it with boundary
+  } else {
+    headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(data);
+  }
+
+  const response = await fetch(url, options);
+  return await response.json();
 }
 
 /**
  * Admin Teachers API
  */
 export async function adminTeachersApi(method: string, id: number | null, data: FormData | object) {
-    const token = localStorage.getItem('tjkt_admin_token');
-    const url = id ? `${API_BASE_URL}/admin/teachers/${id}` : `${API_BASE_URL}/admin/teachers`;
-    
-    const headers: any = {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
+  const token = localStorage.getItem('tjkt_admin_token');
+  const url = id ? `/admin/teachers/${id}` : `/admin/teachers`;
 
-    const options: RequestInit = {
-        method,
-        headers,
-    };
+  const headers: any = {
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
 
-    if (data instanceof FormData) {
-        options.body = data;
-    } else {
-        headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify(data);
-    }
+  const options: RequestInit = {
+    method,
+    headers,
+  };
 
-    const response = await fetch(url, options);
-    return await response.json();
+  if (data instanceof FormData) {
+    options.body = data;
+  } else {
+    headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(data);
+  }
+
+  const response = await fetch(url, options);
+  return await response.json();
 }
 
 /**
  * Admin Achievements API
  */
 export async function adminAchievementsApi(method: string, id: number | null, data: object) {
-    const token = localStorage.getItem('tjkt_admin_token');
-    const url = id ? `${API_BASE_URL}/admin/achievements/${id}` : `${API_BASE_URL}/admin/achievements`;
-    
-    const response = await fetch(url, {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-    });
-    return await response.json();
+  const token = localStorage.getItem('tjkt_admin_token');
+  const url = id ? `/admin/achievements/${id}` : `/admin/achievements`;
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data),
+  });
+  return await response.json();
 }
