@@ -27,7 +27,7 @@ class AdminGalleryController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('gallery', 'public');
-            $url = '/storage/' . $path;
+            $url = '/api/storage/' . $path;
         }
 
         $gallery = GalleryItem::create([
@@ -65,7 +65,7 @@ class AdminGalleryController extends Controller
                 Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('image')->store('gallery', 'public');
-            $url = '/storage/' . $path;
+            $url = '/api/storage/' . $path;
         } elseif ($request->url && $request->url !== $gallery->url) {
             if (str_starts_with($gallery->url, '/storage/')) {
                 $oldPath = str_replace('/storage/', '', $gallery->url);

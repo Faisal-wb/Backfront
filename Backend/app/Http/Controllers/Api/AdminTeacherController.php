@@ -23,7 +23,7 @@ class AdminTeacherController extends Controller
         $url = null;
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('teachers', 'public');
-            $url = '/storage/' . $path;
+            $url = '/api/storage/' . $path;
         }
 
         $teacher = Teacher::create([
@@ -64,7 +64,7 @@ class AdminTeacherController extends Controller
                 Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('image')->store('teachers', 'public');
-            $url = '/storage/' . $path;
+            $url = '/api/storage/' . $path;
         }
 
         $teacher->update([

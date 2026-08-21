@@ -53,7 +53,7 @@ class SiteSettingController extends Controller
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
                 $path = $request->file($field)->store('site_content', 'public');
-                $payload[$field] = '/storage/' . $path;
+                $payload[$field] = '/api/storage/' . $path;
             } elseif (isset($payload[$field]) && is_string($payload[$field]) && str_starts_with($payload[$field], 'data:image')) {
                 // Fallback for base64 image if any
                 $base64Image = $payload[$field];
@@ -72,7 +72,7 @@ class SiteSettingController extends Controller
                 Storage::disk('public')->put($imageName, base64_decode($image));
                 
                 // Update payload with URL
-                $payload[$field] = '/storage/' . $imageName;
+                $payload[$field] = '/api/storage/' . $imageName;
             }
         }
 

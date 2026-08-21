@@ -16,8 +16,13 @@ use App\Http\Controllers\Api\SiteSettingController;
 | Public API Routes (Read-Only - No Login Required)
 |--------------------------------------------------------------------------
 */
-Route::get('/storage/site_content/{filename}', function ($filename) {
-    $path = storage_path('app/public/site_content/' . $filename);
+Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
+    // Prevent directory traversal
+    if (str_contains($folder, '.') || str_contains($filename, '.')) {
+        if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename)) abort(404);
+    }
+    
+    $path = storage_path('app/public/' . $folder . '/' . $filename);
     if (!file_exists($path)) {
         abort(404);
     }
