@@ -817,38 +817,9 @@ export default function App() {
 
   // Dynamic API state loaded from Laravel MySQL & Admin Panel
   const [dbStatus, setDbStatus] = useState<"connected" | "offline">("offline");
-  const [dynamicTeachers, setDynamicTeachers] = useState<any[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("tjkt_teachers");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length >= 1) {
-            return parsed.map((t: any) => ({
-              ...t,
-              image: t.image && t.image.length > 150_000 ? "" : t.image
-            }));
-          }
-        }
-      } catch (e) {
-        console.warn("[Teachers] Failed to parse localStorage:", e);
-      }
-    }
-    return FACULTY;
-  });
+  const [dynamicTeachers, setDynamicTeachers] = useState<any[]>(FACULTY);
 
-  const [dynamicAchievements, setDynamicAchievements] = useState<any[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("tjkt_achievements");
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length >= PRESTASI.length) return parsed;
-        } catch (e) { }
-      }
-    }
-    return PRESTASI;
-  });
+  const [dynamicAchievements, setDynamicAchievements] = useState<any[]>(PRESTASI);
 
   // Gallery state: dikelola sepenuhnya oleh AdminGallery via IndexedDB.
   // Inisialisasi dengan foto HD bawaan; setelah AdminGallery mount, onSyncGallery akan dipanggil
@@ -857,17 +828,9 @@ export default function App() {
 
 
 
-  const [dynamicMessages, setDynamicMessages] = useState<any[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("tjkt_messages");
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) { }
-      }
-    }
-    return [
-      { name: "Siti Rahma", email: "siti@gmail.com", message: "Apakah ada informasi pendaftaran gelombang 2 PPDB TJKT?" }
-    ];
-  });
+  const [dynamicMessages, setDynamicMessages] = useState<any[]>([
+    { name: "Siti Rahma", email: "siti@gmail.com", message: "Apakah ada informasi pendaftaran gelombang 2 PPDB TJKT?" }
+  ]);
 
   // Admin view state
   const [isAdminView, setIsAdminView] = useState(() =>

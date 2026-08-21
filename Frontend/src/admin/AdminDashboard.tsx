@@ -232,56 +232,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         </div>
       </div>
-
-      {/* ── 1-CLICK BACKUP DATA ─────────────────────────────────── */}
-      <div
-        className={`p-6 rounded-2xl border transition-all ${
-          isDark
-            ? "bg-[#121215] border-zinc-800/80 shadow-md"
-            : "bg-white border-slate-200/80 shadow-sm"
-        }`}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl border ${
-              isDark ? "bg-emerald-950/40 border-emerald-800/40 text-emerald-400" : "bg-emerald-50 border-emerald-100 text-emerald-600"
-            }`}>
-              <Download size={22} />
-            </div>
-            <div>
-              <h4 className={`text-base font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
-                Backup &amp; Export Data Website
-              </h4>
-              <p className={`text-xs mt-0.5 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
-                Ekspor seluruh data (Guru, Prestasi, Galeri Meta) ke file JSON sebagai cadangan aman.
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              const data = {
-                teachers: JSON.parse(localStorage.getItem("tjkt_teachers") || "[]"),
-                achievements: JSON.parse(localStorage.getItem("tjkt_achievements") || "[]"),
-                galleryMeta: JSON.parse(localStorage.getItem("tjkt_gallery_meta") || "[]"),
-                exportedAt: new Date().toISOString(),
-              };
-              const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `LT3_Backup_${new Date().toISOString().slice(0, 10)}.json`;
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md cursor-pointer flex items-center gap-2 self-start sm:self-auto"
-          >
-            <Download size={14} />
-            Export Backup JSON
-          </button>
-        </div>
-      </div>
     </div>
   );
-};
 

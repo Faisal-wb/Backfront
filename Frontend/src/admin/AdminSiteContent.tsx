@@ -232,15 +232,6 @@ async function idbGet(key: string): Promise<string | undefined> {
 }
 
 export function loadSiteContent(): SiteContentData {
-  try {
-    const raw = localStorage.getItem(SITE_CONTENT_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      return { ...DEFAULT_SITE_CONTENT, ...parsed };
-    }
-  } catch (e) {
-    console.warn("Gagal membaca site content:", e);
-  }
   return DEFAULT_SITE_CONTENT;
 }
 
@@ -250,20 +241,14 @@ export async function loadSiteContentAsync(): Promise<SiteContentData> {
   if (result.success && result.data) {
     return { ...DEFAULT_SITE_CONTENT, ...result.data };
   }
-  // Fallback to local storage if API fails
-  return loadSiteContent();
+  // Fallback to default if API fails
+  return DEFAULT_SITE_CONTENT;
 }
 
 export async function saveSiteContent(data: SiteContentData): Promise<{success: boolean, data?: SiteContentData}> {
   // Save to API
   const result = await saveSiteContentApi(data);
   if (result.success && result.data) {
-    // Also update local storage as a fallback cache
-    try {
-      localStorage.setItem(SITE_CONTENT_KEY, JSON.stringify(result.data));
-    } catch (e) {
-      console.warn("Gagal update local cache:", e);
-    }
     return { success: true, data: result.data };
   }
   return { success: false };
