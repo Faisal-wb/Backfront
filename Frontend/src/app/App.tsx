@@ -855,55 +855,6 @@ export default function App() {
   // dengan foto-foto yang sudah diresolved dari IndexedDB (termasuk upload user).
   const [dynamicGallery, setDynamicGallery] = useState<any[]>(GALLERY);
 
-  // Pada mount awal, baca meta dari localStorage dan resolve foto dari IndexedDB
-  useEffect(() => {
-    const GALLERY_META_KEY = "tjkt_gallery_meta";
-    const IDB_DB_NAME = "tjkt_gallery_db";
-    const IDB_STORE = "images";
-
-    function openDB(): Promise<IDBDatabase> {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(IDB_DB_NAME, 1);
-        req.onupgradeneeded = () => { req.result.createObjectStore(IDB_STORE); };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    async function idbGet(id: string): Promise<string | undefined> {
-      const db = await openDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(IDB_STORE, "readonly");
-        const req = tx.objectStore(IDB_STORE).get(id);
-        req.onsuccess = () => resolve(req.result as string | undefined);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    (async () => {
-      try {
-        const raw = localStorage.getItem(GALLERY_META_KEY);
-        if (!raw) return; // belum ada perubahan dari admin, pakai GALLERY default
-        const metaList: { id: string; alt: string; isBuiltin?: boolean }[] = JSON.parse(raw);
-        if (!Array.isArray(metaList) || metaList.length === 0) return;
-
-        // Sequential load to avoid blocking main thread with large IndexedDB reads
-        const items: { url: string; alt: string }[] = [];
-        for (const m of metaList) {
-          if (m.isBuiltin || !m.id.startsWith("idb:")) {
-            items.push({ url: m.id, alt: m.alt });
-          } else {
-            const data = await idbGet(m.id).catch(() => undefined);
-            items.push({ url: data || "", alt: m.alt });
-          }
-        }
-        const valid = items.filter((i) => !!i.url);
-        if (valid.length > 0) setDynamicGallery(valid);
-      } catch (e) {
-        console.warn("[App] Gallery IDB load error:", e);
-      }
-    })();
-  }, []);
 
 
   const [dynamicMessages, setDynamicMessages] = useState<any[]>(() => {
