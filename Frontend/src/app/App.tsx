@@ -170,13 +170,15 @@ function TikTokIcon({ size = 15, className = "" }: { size?: number; className?: 
   );
 }
 
-function Tag({ label, green }: { label: string; green?: boolean }) {
+function Tag({ label, green, red }: { label: string; green?: boolean; red?: boolean }) {
 
   return (
     <span
       className={`inline-block px-3 py-1 rounded-full text-xs border transition-colors duration-200 ${green
         ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/8 dark:text-emerald-400 hover:bg-emerald-500/20"
-        : "border-slate-200 bg-slate-100 text-slate-700 hover:border-red-500/40 hover:text-slate-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-red-500/35 dark:hover:text-zinc-200"
+        : red
+        ? "border-red-500/30 bg-red-500/10 text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-400 hover:bg-red-500/20"
+        : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-white/20"
         }`}
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
@@ -1474,7 +1476,7 @@ export default function App() {
                       Kuasai pengembangan web, mobile, dan game dengan teknologi terkini. Dari backend Laravel hingga game Unity, kami siapkan kamu menjadi developer profesional.
                     </p>
                     <div className="flex flex-wrap gap-2 mb-7">
-                      {PROGRAMMING_TAGS.map(tag => <Tag key={tag} label={tag} />)}
+                      {PROGRAMMING_TAGS.map(tag => <Tag key={tag} label={tag} red />)}
                     </div>
                     <div className="grid grid-cols-3 gap-3 pt-5 border-t border-slate-200 dark:border-white/[0.06]">
                       {[["Web Dev", "Laravel/PHP"], ["Mobile", "Android/iOS"], ["Game Dev", "Unity/C#"]].map(([t, s]) => (
