@@ -298,7 +298,7 @@ export async function saveSiteContentApi(data: any) {
  */
 export async function adminGalleryApi(method: string, id: number | null, data: FormData | object) {
     const token = localStorage.getItem('tjkt_admin_token');
-    const url = id ? `/admin/gallery/${id}` : `/admin/gallery`;
+    const url = id ? `${API_BASE_URL}/admin/gallery/${id}` : `${API_BASE_URL}/admin/gallery`;
     
     const headers: any = {
         'Accept': 'application/json',
@@ -327,7 +327,7 @@ export async function adminGalleryApi(method: string, id: number | null, data: F
  */
 export async function adminTeachersApi(method: string, id: number | null, data: FormData | object) {
     const token = localStorage.getItem('tjkt_admin_token');
-    const url = id ? `/admin/teachers/${id}` : `/admin/teachers`;
+    const url = id ? `${API_BASE_URL}/admin/teachers/${id}` : `${API_BASE_URL}/admin/teachers`;
     
     const headers: any = {
         'Accept': 'application/json',
@@ -355,7 +355,7 @@ export async function adminTeachersApi(method: string, id: number | null, data: 
  */
 export async function adminAchievementsApi(method: string, id: number | null, data: object) {
     const token = localStorage.getItem('tjkt_admin_token');
-    const url = id ? `/admin/achievements/${id}` : `/admin/achievements`;
+    const url = id ? `${API_BASE_URL}/admin/achievements/${id}` : `${API_BASE_URL}/admin/achievements`;
     
     const response = await fetch(url, {
         method,
