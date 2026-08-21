@@ -35,9 +35,15 @@ class SiteSettingController extends Controller
      */
     public function update(Request $request)
     {
-        $payload = $request->all();
+        $payloadRaw = $request->input('payload');
+        
+        if ($payloadRaw && is_string($payloadRaw)) {
+            $payload = json_decode($payloadRaw, true);
+        } else {
+            $payload = $request->all();
+        }
 
-        // Process base64 images
+        // Process base64 images or actual uploaded files
         $imageFields = [
             'heroImage1', 'heroImage2',
             'aboutImage1', 'aboutImage2',
@@ -45,22 +51,24 @@ class SiteSettingController extends Controller
         ];
 
         foreach ($imageFields as $field) {
-            if (isset($payload[$field]) && is_string($payload[$field]) && str_starts_with($payload[$field], 'data:image')) {
-                // It's a base64 image
+            if ($request->hasFile($field)) {
+                $path = $request->file($field)->store('site_content', 'public');
+                $payload[$field] = '/storage/' . $path;
+            } elseif (isset($payload[$field]) && is_string($payload[$field]) && str_starts_with($payload[$field], 'data:image')) {
+                // Fallback for base64 image if any
                 $base64Image = $payload[$field];
                 
                 // Extract extension
                 $extension = explode('/', explode(':', substr($base64Image, 0, strpos($base64Image, ';')))[1])[1];
                 
                 // Remove the "data:image/xxx;base64," part
-                $replace = substr($base64Image, 0, strpos($base64Image, ',') + 1); 
-                $image = str_replace($replace, '', $base64Image); 
+                $image = substr($base64Image, strpos($base64Image, ',') + 1); 
                 $image = str_replace(' ', '+', $image); 
                 
                 // Generate unique filename
                 $imageName = 'site_content/' . Str::random(10) . '_' . time() . '.' . $extension;
                 
-                // Save to storage (storage/app/public/site_content)
+                // Save to storage
                 Storage::disk('public')->put($imageName, base64_decode($image));
                 
                 // Update payload with URL

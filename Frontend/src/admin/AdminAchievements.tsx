@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Award, Plus, Trash2, X, Check, Search, Pencil } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Award, Plus, Trash2, X, Check, Search, Pencil, Database } from "lucide-react";
+import { adminAchievementsApi } from "../services/api";
 
 export interface AchievementData {
+  id?: number;
   year: string;
   event: string;
   result: string;
@@ -16,13 +18,19 @@ interface AdminAchievementsProps {
 
 const EMPTY_FORM: AchievementData = { year: "2026", event: "", result: "", tier: "gold" };
 
-export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievements, onUpdateAchievements, theme = "light" }) => {
+export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievements: propAchievements, onUpdateAchievements, theme = "light" }) => {
   const isDark = theme === "dark";
 
-  // modalMode: null = tutup, "add" = tambah baru, number = index yang diedit
+  const [achievements, setAchievements] = useState<AchievementData[]>(propAchievements || []);
   const [modalMode, setModalMode] = useState<null | "add" | number>(null);
   const [formData, setFormData] = useState<AchievementData>(EMPTY_FORM);
   const [searchQuery, setSearchQuery] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onUpdateAchievements(achievements);
+  }, [achievements, onUpdateAchievements]);
 
   const filteredAchievements = achievements.filter(
     (a) =>
@@ -31,39 +39,78 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
       a.year.includes(searchQuery)
   );
 
-  /* ── Handlers ── */
   const openAdd = () => {
     setFormData(EMPTY_FORM);
+    setSaveError(null);
     setModalMode("add");
   };
 
   const openEdit = (idx: number) => {
     setFormData({ ...achievements[idx] });
+    setSaveError(null);
     setModalMode(idx);
   };
 
   const closeModal = () => {
     setModalMode(null);
     setFormData(EMPTY_FORM);
+    setSaveError(null);
   };
 
-  const handleDelete = (index: number) => {
-    if (window.confirm(`Yakin menghapus prestasi "${achievements[index].event}"?`)) {
-      onUpdateAchievements(achievements.filter((_, i) => i !== index));
+  const handleDelete = async (index: number) => {
+    const item = achievements[index];
+    if (window.confirm(`Yakin menghapus prestasi "${item.event}"?`)) {
+      if (item.id) {
+        try {
+          await adminAchievementsApi('DELETE', item.id, {});
+        } catch (e) {
+          console.error("Failed to delete from server", e);
+        }
+      }
+      setAchievements(achievements.filter((_, i) => i !== index));
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.event || !formData.result) return;
+    if (!formData.event || !formData.result || uploading) return;
 
-    if (modalMode === "add") {
-      onUpdateAchievements([formData, ...achievements]);
-    } else if (typeof modalMode === "number") {
-      const updated = achievements.map((item, i) => (i === modalMode ? { ...formData } : item));
-      onUpdateAchievements(updated);
+    setUploading(true);
+    setSaveError(null);
+
+    try {
+      const isEdit = typeof modalMode === "number";
+      const id = isEdit ? achievements[modalMode as number].id! : null;
+      
+      const payload = {
+        event: formData.event,
+        result: formData.result,
+        tier: formData.tier,
+        year: formData.year,
+        order: achievements.length
+      };
+
+      const res = await adminAchievementsApi('POST', id, payload);
+      
+      if (res.status === 'success') {
+        let updated: AchievementData[];
+        if (isEdit) {
+          updated = [...achievements];
+          updated[modalMode as number] = res.data;
+        } else {
+          updated = [res.data, ...achievements];
+        }
+
+        setAchievements(updated);
+        closeModal();
+      } else {
+        setSaveError(res.message || "Gagal menyimpan data prestasi.");
+      }
+    } catch (err: any) {
+      setSaveError(err.message || "Terjadi kesalahan server saat menyimpan data.");
+    } finally {
+      setUploading(false);
     }
-    closeModal();
   };
 
   const isEditing = typeof modalMode === "number";
@@ -75,7 +122,6 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
 
   return (
     <div className="space-y-6">
-      {/* ── Header bar ── */}
       <div
         className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl border transition-all ${
           isDark ? "bg-[#121215] border-zinc-800/80 shadow-md" : "bg-white border-slate-200/80 shadow-sm"
@@ -86,8 +132,9 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
             <Award className="text-amber-500" size={22} />
             Kelola Prestasi &amp; Kejuaraan TJKT
           </h2>
-          <p className={`text-xs mt-1 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
-            Daftar juara LKS, AI, Web Tech, dan IT Competition
+          <p className={`text-xs mt-1 flex items-center gap-2 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
+            <Database size={11} className="text-amber-500" />
+            Tersimpan di Database MySQL &mdash; Sinkronisasi Otomatis
           </p>
         </div>
         <button
@@ -99,7 +146,6 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
         </button>
       </div>
 
-      {/* ── Search Bar ── */}
       <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
         isDark ? "bg-[#121215] border-zinc-800/80" : "bg-white border-slate-200/80"
       }`}>
@@ -120,7 +166,6 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
         )}
       </div>
 
-      {/* ── Table ── */}
       <div className={`border rounded-2xl overflow-hidden ${
         isDark ? "bg-[#121215] border-zinc-800/80 shadow-md" : "bg-white border-slate-200/80 shadow-sm"
       }`}>
@@ -161,7 +206,6 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      {/* Edit + Delete buttons */}
                       <div className="inline-flex items-center gap-1.5">
                         <button
                           onClick={() => openEdit(idx)}
@@ -195,13 +239,11 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
         </div>
       </div>
 
-      {/* ── Modal Tambah / Edit ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm">
           <div className={`w-full max-w-md border rounded-2xl p-6 shadow-2xl space-y-4 ${
             isDark ? "bg-[#18181b] border-zinc-800 text-white" : "bg-white border-slate-200 text-slate-900"
           }`}>
-            {/* Modal header */}
             <div className={`flex items-center justify-between border-b pb-4 ${isDark ? "border-zinc-800" : "border-slate-100"}`}>
               <div className="flex items-center gap-2">
                 {isEditing ? (
@@ -221,7 +263,12 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
               </button>
             </div>
 
-            {/* Form */}
+            {saveError && (
+              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-semibold">
+                {saveError}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -273,7 +320,6 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                 />
               </div>
 
-              {/* Preview badge */}
               <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border ${isDark ? "bg-zinc-900/60 border-zinc-800" : "bg-slate-50 border-slate-200"}`}>
                 <span className={`text-xs ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Preview tier:</span>
                 <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
@@ -287,11 +333,11 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                 </span>
               </div>
 
-              {/* Footer buttons */}
               <div className={`flex items-center justify-end gap-3 pt-4 border-t ${isDark ? "border-zinc-800" : "border-slate-100"}`}>
                 <button
                   type="button"
                   onClick={closeModal}
+                  disabled={uploading}
                   className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                     isDark ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-slate-100 hover:bg-slate-200 text-slate-700"
                   }`}
@@ -300,14 +346,16 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                 </button>
                 <button
                   type="submit"
+                  disabled={uploading}
                   className={`px-5 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 shadow-md transition-all cursor-pointer ${
+                    uploading ? "opacity-50 cursor-not-allowed bg-blue-500" :
                     isEditing
                       ? "bg-blue-600 hover:bg-blue-500 shadow-blue-500/20"
                       : "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20"
                   }`}
                 >
                   <Check size={15} />
-                  {isEditing ? "Simpan Perubahan" : "Simpan Prestasi"}
+                  {uploading ? "Menyimpan..." : isEditing ? "Simpan Perubahan" : "Simpan Prestasi"}
                 </button>
               </div>
             </form>

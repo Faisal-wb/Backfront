@@ -6,6 +6,57 @@ import {
 } from "lucide-react";
 import { saveSiteContentApi, fetchSiteContentApi } from "../services/api";
 
+/** Kompres foto base64 (maxPx dinamis, format WebP) */
+function compressImage(dataUrl: string, maxPx = 1600, quality = 0.75): Promise<string> {
+  return new Promise((resolve) => {
+    if (!dataUrl || !dataUrl.startsWith("data:")) {
+      resolve(dataUrl);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * ratio));
+        canvas.height = Math.max(1, Math.round(img.height * ratio));
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/webp", quality));
+          return;
+        }
+        resolve(dataUrl);
+      } catch (err) {
+        console.warn("Canvas compression failed:", err);
+        resolve(dataUrl);
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+function dataURLtoFile(dataurl: string, filename: string): File | null {
+  try {
+    const arr = dataurl.split(',');
+    if (arr.length < 2) return null;
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) return null;
+    const mime = mimeMatch[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  } catch (e) {
+    console.error("Error converting dataURL to File", e);
+    return null;
+  }
+}
+
 export interface NavItem {
   id: string;
   label: string;
@@ -266,7 +317,31 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
 
   const handleSave = async () => {
     setIsSaving(true);
-    const result = await saveSiteContent(formData);
+    
+    const payloadData = { ...formData };
+    const fd = new FormData();
+    
+    // Process image fields
+    const imageFields: (keyof SiteContentData)[] = [
+      "heroImage1", "heroImage2",
+      "aboutImage1", "aboutImage2",
+      "kompetensiImageProgramming", "kompetensiImageNetworking",
+    ];
+
+    imageFields.forEach((field) => {
+      const val = payloadData[field];
+      if (typeof val === 'string' && val.startsWith('data:image')) {
+        const file = dataURLtoFile(val, `${field}.webp`);
+        if (file) {
+          fd.append(field, file);
+        }
+        delete payloadData[field]; // Remove from JSON payload
+      }
+    });
+
+    fd.append('payload', JSON.stringify(payloadData));
+
+    const result = await saveSiteContent(fd as any);
     setIsSaving(false);
     
     if (result.success && result.data) {
@@ -667,7 +742,10 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
-                        reader.onloadend = () => setFormData({ ...formData, heroImage1: reader.result as string });
+                        reader.onloadend = async () => {
+                          const compressed = await compressImage(reader.result as string, 1600, 0.75);
+                          setFormData({ ...formData, heroImage1: compressed });
+                        };
                         reader.readAsDataURL(e.target.files[0]);
                       }
                     }}
@@ -717,7 +795,10 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
-                        reader.onloadend = () => setFormData({ ...formData, heroImage2: reader.result as string });
+                        reader.onloadend = async () => {
+                          const compressed = await compressImage(reader.result as string, 1600, 0.75);
+                          setFormData({ ...formData, heroImage2: compressed });
+                        };
                         reader.readAsDataURL(e.target.files[0]);
                       }
                     }}
@@ -927,7 +1008,10 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
-                        reader.onloadend = () => setFormData({ ...formData, aboutImage1: reader.result as string });
+                        reader.onloadend = async () => {
+                          const compressed = await compressImage(reader.result as string, 1200, 0.75);
+                          setFormData({ ...formData, aboutImage1: compressed });
+                        };
                         reader.readAsDataURL(e.target.files[0]);
                       }
                     }}
@@ -974,7 +1058,10 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
-                        reader.onloadend = () => setFormData({ ...formData, aboutImage2: reader.result as string });
+                        reader.onloadend = async () => {
+                          const compressed = await compressImage(reader.result as string, 600, 0.75);
+                          setFormData({ ...formData, aboutImage2: compressed });
+                        };
                         reader.readAsDataURL(e.target.files[0]);
                       }
                     }}
@@ -1109,7 +1196,10 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
-                        reader.onloadend = () => setFormData({ ...formData, kompetensiImageProgramming: reader.result as string });
+                        reader.onloadend = async () => {
+                          const compressed = await compressImage(reader.result as string, 800, 0.75);
+                          setFormData({ ...formData, kompetensiImageProgramming: compressed });
+                        };
                         reader.readAsDataURL(e.target.files[0]);
                       }
                     }}
@@ -1156,7 +1246,10 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
-                        reader.onloadend = () => setFormData({ ...formData, kompetensiImageNetworking: reader.result as string });
+                        reader.onloadend = async () => {
+                          const compressed = await compressImage(reader.result as string, 800, 0.75);
+                          setFormData({ ...formData, kompetensiImageNetworking: compressed });
+                        };
                         reader.readAsDataURL(e.target.files[0]);
                       }
                     }}

@@ -1,5 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Edit2, UserCheck, X, Upload, AlertTriangle, Check, Search } from "lucide-react";
+import { Plus, Trash2, Edit2, UserCheck, X, Upload, AlertTriangle, Check, Search, Database } from "lucide-react";
+import { adminTeachersApi } from "../services/api";
+
+function compressImage(file: File, maxPx = 800, quality = 0.75): Promise<File> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * ratio));
+        canvas.height = Math.max(1, Math.round(img.height * ratio));
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: "image/webp" });
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          }, "image/webp", quality);
+        } else {
+          resolve(file);
+        }
+      };
+      img.onerror = () => resolve(file);
+      img.src = dataUrl;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
 
 export interface TeacherData {
   id?: number;
@@ -8,81 +43,7 @@ export interface TeacherData {
   initials: string;
   color: string;
   image?: string;
-}
-
-const TEACHERS_KEY = "tjkt_teachers";
-
-/** Kompres foto guru base64 ke JPEG super hemat (max 450px, 65% quality) ~20KB */
-function compressImage(dataUrl: string, maxPx = 450, quality = 0.65): Promise<string> {
-  return new Promise((resolve) => {
-    if (!dataUrl || !dataUrl.startsWith("data:")) {
-      resolve(dataUrl);
-      return;
-    }
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(img.width * ratio));
-        canvas.height = Math.max(1, Math.round(img.height * ratio));
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL("image/jpeg", quality));
-          return;
-        }
-        resolve(dataUrl);
-      } catch (err) {
-        console.warn("Canvas compression failed:", err);
-        resolve(dataUrl);
-      }
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
-
-/** Baca data guru dari localStorage & bersihkan foto lama yang tersumbat (>150.000 char) */
-function loadTeachers(fallback: TeacherData[]): TeacherData[] {
-  try {
-    const raw = localStorage.getItem(TEACHERS_KEY);
-    if (raw) {
-      const parsed: TeacherData[] = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        // Otomatis bersihkan foto lama tak terkompresi yang menyumbat localStorage
-        const cleaned = parsed.map(t => ({
-          ...t,
-          image: t.image && t.image.length > 150_000 ? "" : t.image
-        }));
-        return cleaned;
-      }
-    }
-  } catch (e) {
-    console.warn("[AdminTeachers] Gagal membaca localStorage:", e);
-  }
-  return fallback;
-}
-
-/** Simpan data guru ke localStorage dengan proteksi pembersihan otomatis */
-function saveTeachers(items: TeacherData[]): boolean {
-  try {
-    localStorage.setItem(TEACHERS_KEY, JSON.stringify(items));
-    return true;
-  } catch (e) {
-    console.warn("[AdminTeachers] Quota exceeded! Bersihkan foto lama raksasa:", e);
-    try {
-      // Hapus foto lama yang ukurannya di atas 150KB agar simpanan selalu sukses
-      const slim = items.map((t) => ({
-        ...t,
-        image: t.image && t.image.length > 150_000 ? "" : t.image,
-      }));
-      localStorage.setItem(TEACHERS_KEY, JSON.stringify(slim));
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  order?: number;
 }
 
 interface AdminTeachersProps {
@@ -94,21 +55,18 @@ interface AdminTeachersProps {
 export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeachers, onUpdateTeachers, theme = "light" }) => {
   const isDark = theme === "dark";
 
-  // State utama dikelola mandiri dari localStorage
-  const [teachers, setTeachers] = useState<TeacherData[]>(() => loadTeachers(propTeachers));
+  const [teachers, setTeachers] = useState<TeacherData[]>(propTeachers || []);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<TeacherData>({
-    name: "",
-    role: "",
-    initials: "",
-    color: "#059669",
-    image: "",
+  const [formData, setFormData] = useState<{ file: File | null; data: TeacherData }>({
+    file: null,
+    data: { name: "", role: "", initials: "", color: "#059669", image: "" }
   });
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const [searchQuery, setSearchQuery] = useState("");
   const filteredTeachers = teachers.filter(
@@ -117,84 +75,116 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
       t.role.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    onUpdateTeachers(teachers);
+  }, [teachers, onUpdateTeachers]);
+
+  useEffect(() => {
+    if (!formData.file) {
+      const url = formData.data.image || "";
+      setPreviewUrl(url.startsWith('/') ? `https://lt3tjkt.smkthpati.sch.id${url}` : url);
+      return;
+    }
+    const objUrl = URL.createObjectURL(formData.file);
+    setPreviewUrl(objUrl);
+    return () => URL.revokeObjectURL(objUrl);
+  }, [formData.file, formData.data.image]);
+
   const handleOpenAdd = () => {
     setEditingIndex(null);
-    setFormData({ name: "", role: "", initials: "", color: "#059669", image: "" });
+    setFormData({ 
+      file: null, 
+      data: { name: "", role: "", initials: "", color: "#059669", image: "" } 
+    });
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (index: number) => {
     setEditingIndex(index);
-    setFormData({ ...teachers[index] });
+    setFormData({ 
+      file: null, 
+      data: { ...teachers[index] } 
+    });
     setIsModalOpen(true);
   };
 
-  const handleDelete = (index: number) => {
-    if (window.confirm(`Yakin ingin menghapus guru ${teachers[index].name}?`)) {
+  const handleDelete = async (index: number) => {
+    const item = teachers[index];
+    if (window.confirm(`Yakin ingin menghapus guru ${item.name}?`)) {
+      if (item.id) {
+        try {
+          await adminTeachersApi('DELETE', item.id, {});
+        } catch (e) {
+          console.error("Failed to delete from server", e);
+        }
+      }
       const updated = teachers.filter((_, i) => i !== index);
       setTeachers(updated);
-      saveTeachers(updated);
-      onUpdateTeachers(updated);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setUploading(true);
+    const compressed = await compressImage(file, 800, 0.75);
+    setFormData(prev => ({ ...prev, file: compressed }));
+    setUploading(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.data.name || !formData.data.role || uploading) return;
 
     setUploading(true);
     setSaveError(null);
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const raw = reader.result as string;
-        const compressed = await compressImage(raw, 450, 0.65);
-        setFormData(prev => ({ ...prev, image: compressed }));
-      } catch (err) {
-        console.error("Compression error:", err);
-      } finally {
-        setUploading(false);
+
+    const initials = formData.data.initials || formData.data.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+    
+    const payload = new FormData();
+    payload.append('name', formData.data.name);
+    payload.append('role', formData.data.role);
+    payload.append('initials', initials);
+    payload.append('color', formData.data.color || "#059669");
+    if (formData.file) {
+      payload.append('image', formData.file);
+    }
+
+    try {
+      const isEdit = editingIndex !== null;
+      const id = isEdit ? teachers[editingIndex].id! : null;
+      
+      const res = await adminTeachersApi('POST', id, payload);
+      
+      if (res.status === 'success') {
+        let updated: TeacherData[];
+        if (isEdit) {
+          updated = [...teachers];
+          updated[editingIndex] = res.data;
+        } else {
+          updated = [...teachers, res.data];
+        }
+
+        setTeachers(updated);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+        setIsModalOpen(false);
+      } else {
+        setSaveError(res.message || "Gagal menyimpan data guru.");
       }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.role || uploading) return;
-
-    const initials = formData.initials || formData.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
-    const newTeacher = { ...formData, initials };
-
-    let updated: TeacherData[];
-    if (editingIndex !== null) {
-      updated = [...teachers];
-      updated[editingIndex] = newTeacher;
-    } else {
-      updated = [...teachers, newTeacher];
+    } catch (err: any) {
+      setSaveError(err.message || "Terjadi kesalahan server saat menyimpan data.");
+    } finally {
+      setUploading(false);
     }
-
-    setTeachers(updated);
-    const ok = saveTeachers(updated);
-    if (!ok) {
-      setSaveError("Penyimpanan lokal penuh. Coba foto lain.");
-    } else {
-      setSaveError(null);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    }
-
-    onUpdateTeachers(updated);
-    setIsModalOpen(false);
   };
 
   return (
     <div className="space-y-6">
-      {/* Alert status */}
       {saveSuccess && (
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
           <Check size={16} />
-          <span>Data Guru & Foto berhasil tersimpan permanen!</span>
+          <span>Data Guru & Foto berhasil tersimpan permanen di Server!</span>
         </div>
       )}
 
@@ -205,7 +195,6 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
         </div>
       )}
 
-      {/* Header */}
       <div
         className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl border transition-all ${isDark
             ? "bg-[#121215] border-zinc-800/80 shadow-md"
@@ -217,8 +206,9 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
             <UserCheck className="text-emerald-500" size={22} />
             Kelola Data Guru Produktif TJKT
           </h2>
-          <p className={`text-xs mt-1 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
-            Tambah, edit, atau hapus pengajar produktif jurusan
+          <p className={`text-xs mt-1 flex items-center gap-2 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
+            <Database size={11} className="text-emerald-500" />
+            Terhubung ke Database MySQL — Tampil Publik di Web
           </p>
         </div>
         <button
@@ -230,7 +220,6 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
         </button>
       </div>
 
-      {/* Search Bar */}
       <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
         isDark ? "bg-[#121215] border-zinc-800/80" : "bg-white border-slate-200/80"
       }`}>
@@ -251,7 +240,6 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
         )}
       </div>
 
-      {/* Grid Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTeachers.length === 0 ? (
           <div className={`col-span-3 text-center py-12 text-sm ${isDark ? "text-zinc-500" : "text-slate-400"}`}>
@@ -259,6 +247,7 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
           </div>
         ) : filteredTeachers.map((t) => {
           const idx = teachers.indexOf(t);
+          const imgSrc = t.image?.startsWith('/') ? `https://lt3tjkt.smkthpati.sch.id${t.image}` : t.image;
           return (
           <div
             key={idx}
@@ -267,11 +256,10 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                 : "bg-white border-slate-200/80 hover:border-slate-300 shadow-sm hover:shadow-md"
               }`}
           >
-            {/* Header Photo Box */}
             <div className="h-48 w-full relative overflow-hidden bg-slate-100 dark:bg-zinc-900 flex-shrink-0">
               {t.image ? (
                 <img
-                  src={t.image}
+                  src={imgSrc}
                   alt={t.name}
                   className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                 />
@@ -286,14 +274,11 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                 </div>
               )}
             </div>
-
-            {/* Info Body */}
             <div className="p-4 flex-1 flex flex-col justify-between">
               <div>
                 <h4 className={`font-bold text-base ${isDark ? "text-white" : "text-slate-900"}`}>{t.name}</h4>
                 <p className={`text-xs mt-1 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>{t.role}</p>
               </div>
-
               <div className={`flex items-center justify-end gap-2 mt-4 pt-3 border-t ${isDark ? "border-zinc-800" : "border-slate-100"}`}>
                 <button
                   onClick={() => handleOpenEdit(idx)}
@@ -319,9 +304,7 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
         })}
       </div>
 
-      {/* Modal Form */}
       {isModalOpen && (
-
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm">
           <div className={`w-full max-w-md border rounded-2xl p-6 shadow-2xl space-y-4 ${isDark ? "bg-[#18181b] border-zinc-800 text-white" : "bg-white border-slate-200 text-slate-900"
             }`}>
@@ -342,8 +325,8 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                 <input
                   type="text"
                   required
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.data.name}
+                  onChange={e => setFormData({ ...formData, data: { ...formData.data, name: e.target.value } })}
                   placeholder="Contoh: M. Bahrun Ni'am, S.Kom."
                   className={`w-full border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 ${isDark ? "bg-[#09090b] border-zinc-800 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                     }`}
@@ -357,8 +340,8 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                 <input
                   type="text"
                   required
-                  value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  value={formData.data.role}
+                  onChange={e => setFormData({ ...formData, data: { ...formData.data, role: e.target.value } })}
                   placeholder="Contoh: Guru Pemrograman Web"
                   className={`w-full border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 ${isDark ? "bg-[#09090b] border-zinc-800 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                     }`}
@@ -367,7 +350,7 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
 
               <div>
                 <label className={`block text-xs font-bold uppercase mb-1 ${isDark ? "text-zinc-300" : "text-slate-700"}`}>
-                  Pilih File Foto dari Laptop
+                  Pilih File Foto Baru
                 </label>
                 <div className="flex items-center gap-3">
                   <label className={`flex-1 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${uploading
@@ -377,7 +360,7 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                         : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
                     }`}>
                     <Upload size={16} />
-                    <span>{uploading ? "Mengompresi Foto..." : formData.image ? "Foto Dipilih ✓ (Siap Simpan)" : "Upload Foto Laptop..."}</span>
+                    <span>{uploading ? "Mengupload..." : formData.file ? "File Dipilih ✓" : "Upload Foto Server..."}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -386,8 +369,8 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                       onChange={handleFileChange}
                     />
                   </label>
-                  {formData.image && (
-                    <img src={formData.image} alt="Preview" className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0" />
+                  {previewUrl && (
+                    <img src={previewUrl} alt="Preview" className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0" />
                   )}
                 </div>
               </div>
@@ -409,7 +392,7 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                       : "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 cursor-pointer"
                     }`}
                 >
-                  Simpan Data Guru
+                  {uploading ? "Menyimpan..." : "Simpan Data Guru"}
                 </button>
               </div>
             </form>
