@@ -644,6 +644,57 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
   const [isHovered, setIsHovered] = React.useState(false);
   const thumbStripRef = React.useRef<HTMLDivElement>(null);
 
+  const [touchStart, setTouchStart] = React.useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+
+    if (distance > minSwipeDistance) {
+      switchToRef.current((activeIdxRef.current + 1) % items.length);
+    } else if (distance < -minSwipeDistance) {
+      switchToRef.current((activeIdxRef.current - 1 + items.length) % items.length);
+    }
+  };
+
+  const [mouseStart, setMouseStart] = React.useState<number | null>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setMouseStart(e.clientX);
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (mouseStart !== null && Math.abs(e.clientX - mouseStart) > 5) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (mouseStart === null) return;
+    const distance = mouseStart - e.clientX;
+    const minDragDistance = 50;
+    if (distance > minDragDistance) {
+      switchToRef.current((activeIdxRef.current + 1) % items.length);
+    } else if (distance < -minDragDistance) {
+      switchToRef.current((activeIdxRef.current - 1 + items.length) % items.length);
+    }
+    setMouseStart(null);
+    setIsDragging(false);
+  };
+
   const items = gallery.length > 0 ? gallery : [];
   const active = items[activeIdx];
 
@@ -717,7 +768,17 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
 
       <div className="flex flex-col md:flex-row h-[85vh] min-h-[480px] max-h-[820px]">
         {/* ── LEFT: Big Main Image ── */}
-        <div className="relative flex-1 overflow-hidden">
+        <div
+          className="relative flex-1 overflow-hidden"
+          style={{ cursor: isDragging ? "grabbing" : "grab" }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={() => setMouseStart(null)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {/* Previous image (fading out) */}
           {prevIdx !== null && items[prevIdx] && (
             <img
