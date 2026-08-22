@@ -781,16 +781,26 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
             </h2>
           </div>
 
+          {/* Mobile Dots Pagination */}
+          <div className="absolute bottom-6 right-6 md:hidden z-30 flex items-center justify-end gap-1.5 flex-wrap max-w-[50%]">
+            {items.map((_, i) => (
+              <button
+                key={`dot-${i}`}
+                onClick={() => switchTo(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === activeIdx ? "w-5 bg-white shadow-[0_0_8px_#ffffff]" : "w-1.5 bg-white/40 hover:bg-white/60"}`}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* ── BOTTOM/RIGHT: Thumbnail Strip ── */}
-        <div ref={thumbStripRef} className="h-20 sm:h-24 w-full md:h-auto md:w-[108px] flex flex-row md:flex-col overflow-x-auto md:overflow-x-hidden md:overflow-y-auto bg-black/80 backdrop-blur-sm border-t md:border-t-0 md:border-l border-white/10 scrollbar-none flex-shrink-0">
+        {/* ── RIGHT: Thumbnail Strip (Desktop Only) ── */}
+        <div ref={thumbStripRef} className="hidden md:flex md:w-[108px] flex-col overflow-y-auto bg-black/80 backdrop-blur-sm border-l border-white/10 scrollbar-none flex-shrink-0">
 
           {items.map((img, i) => (
             <button
               key={i}
               onClick={() => switchTo(i)}
-              className="relative flex-none h-full aspect-square md:w-full md:h-auto overflow-hidden border-r md:border-r-0 md:border-b border-white/10 cursor-pointer transition-all duration-300 group"
+              className="relative flex-none w-full aspect-square overflow-hidden border-b border-white/10 cursor-pointer transition-all duration-300 group"
               style={{
                 outline: "none",
                 opacity: i === activeIdx ? 1 : 0.55,
