@@ -715,8 +715,8 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
         </p>
       </div>
 
-      <div className="flex h-[85vh] min-h-[480px] max-h-[820px]">
-        {/* â”€â”€ LEFT: Big Main Image â”€â”€ */}
+      <div className="flex flex-col md:flex-row h-[85vh] min-h-[480px] max-h-[820px]">
+        {/* ── LEFT: Big Main Image ── */}
         <div className="relative flex-1 overflow-hidden">
           {/* Previous image (fading out) */}
           {prevIdx !== null && items[prevIdx] && (
@@ -783,14 +783,14 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
 
         </div>
 
-        {/* â”€â”€ RIGHT: Vertical Thumbnail Strip â”€â”€ */}
-        <div ref={thumbStripRef} className="w-[72px] sm:w-[88px] md:w-[108px] flex flex-col overflow-y-auto bg-black/80 backdrop-blur-sm border-l border-white/10 scrollbar-none">
+        {/* ── BOTTOM/RIGHT: Thumbnail Strip ── */}
+        <div ref={thumbStripRef} className="h-20 sm:h-24 w-full md:h-auto md:w-[108px] flex flex-row md:flex-col overflow-x-auto md:overflow-x-hidden md:overflow-y-auto bg-black/80 backdrop-blur-sm border-t md:border-t-0 md:border-l border-white/10 scrollbar-none flex-shrink-0">
 
           {items.map((img, i) => (
             <button
               key={i}
               onClick={() => switchTo(i)}
-              className="relative flex-none w-full aspect-square overflow-hidden border-b border-white/10 cursor-pointer transition-all duration-300 group"
+              className="relative flex-none h-full aspect-square md:w-full md:h-auto overflow-hidden border-r md:border-r-0 md:border-b border-white/10 cursor-pointer transition-all duration-300 group"
               style={{
                 outline: "none",
                 opacity: i === activeIdx ? 1 : 0.55,
