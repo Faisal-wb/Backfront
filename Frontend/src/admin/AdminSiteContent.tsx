@@ -104,7 +104,10 @@ export interface SiteContentData {
   aboutDescription: string;
   aboutPoints: string[];
   aboutImage1?: string; // Gambar Utama Section Tentang
+  aboutImage1Caption?: string;
+  aboutImage1Subcaption?: string;
   aboutImage2?: string; // Gambar Badge Offset Section Tentang
+  aboutImage2Caption?: string;
   // Kompetensi
   kompetensiTitle: string;
   kompetensiSubtitle: string;
@@ -160,6 +163,9 @@ const DEFAULT_SITE_CONTENT: SiteContentData = {
     "Sertifikasi Keahlian Internasional (MTCNA, CCNA Ready)",
     "Peluang Kerja Luas di Sektor Digital & Telekomunikasi"
   ],
+  aboutImage1Caption: "Lab Pemrograman & Jaringan",
+  aboutImage1Subcaption: "Fasilitas modern siap industri",
+  aboutImage2Caption: "Fiber Optik Lab",
   // Kompetensi
   kompetensiTitle: "Kompetensi Keahlian",
   kompetensiSubtitle: "Kurikulum Berbasis SKKNI & Mitra Industri Utama",
@@ -1006,6 +1012,28 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
+                <div className="space-y-3 mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                  <div>
+                    <label className="block text-[10px] opacity-75 mb-0.5">Judul Overlay Foto Utama</label>
+                    <input
+                      type="text"
+                      value={formData.aboutImage1Caption || DEFAULT_SITE_CONTENT.aboutImage1Caption}
+                      onChange={(e) => setFormData({ ...formData, aboutImage1Caption: e.target.value })}
+                      className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-semibold ${isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300"}`}
+                      placeholder="Contoh: Lab Pemrograman & Jaringan"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] opacity-75 mb-0.5">Sub-judul Overlay Foto Utama</label>
+                    <input
+                      type="text"
+                      value={formData.aboutImage1Subcaption || DEFAULT_SITE_CONTENT.aboutImage1Subcaption}
+                      onChange={(e) => setFormData({ ...formData, aboutImage1Subcaption: e.target.value })}
+                      className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-semibold ${isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300"}`}
+                      placeholder="Contoh: Fasilitas modern siap industri"
+                    />
+                  </div>
+                </div>
 
               </div>
 
@@ -1056,6 +1084,18 @@ export const AdminSiteContent: React.FC<AdminSiteContentProps> = ({
                   />
                 </div>
 
+                <div className="space-y-3 mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                  <div>
+                    <label className="block text-[10px] opacity-75 mb-0.5">Label Badge (Pojok Kiri Bawah)</label>
+                    <input
+                      type="text"
+                      value={formData.aboutImage2Caption || DEFAULT_SITE_CONTENT.aboutImage2Caption}
+                      onChange={(e) => setFormData({ ...formData, aboutImage2Caption: e.target.value })}
+                      className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-semibold ${isDark ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-slate-300"}`}
+                      placeholder="Contoh: Fiber Optik Lab"
+                    />
+                  </div>
+                </div>
 
               </div>
             </div>

@@ -1359,7 +1359,7 @@ export default function App() {
 
         </section>
 
-        {/* â”€â”€ ABOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── ABOUT ────────────────────────────────────────────── */}
 
 
         <section id="about" className="pt-16 pb-24 px-6">
@@ -1381,8 +1381,8 @@ export default function App() {
                   {/* Image caption overlay */}
                   <div className="absolute bottom-0 inset-x-0 p-5 flex items-end gap-3">
                     <div className="flex-1">
-                      <p className="text-white font-bold text-sm">Lab Pemrograman & Jaringan</p>
-                      <p className="text-zinc-300 dark:text-zinc-400 text-xs mt-0.5">Fasilitas modern siap industri</p>
+                      <p className="text-white font-bold text-sm">{siteContent.aboutImage1Caption || "Lab Pemrograman & Jaringan"}</p>
+                      <p className="text-zinc-300 dark:text-zinc-400 text-xs mt-0.5">{siteContent.aboutImage1Subcaption || "Fasilitas modern siap industri"}</p>
                     </div>
                     <div className="px-3 py-1.5 rounded-full bg-red-600/90 text-white text-xs font-semibold" style={{ fontFamily: "'Inter', sans-serif" }}>
                       TJKT SMK TH
@@ -1398,7 +1398,7 @@ export default function App() {
                     className="w-full h-full object-cover opacity-90 dark:opacity-80"
                   />
                   <div className="absolute inset-0 flex items-end p-2 bg-gradient-to-t from-black/80 to-transparent">
-                    <span className="text-white text-[10px] font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>Fiber Optik Lab</span>
+                    <span className="text-white text-[10px] font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>{siteContent.aboutImage2Caption || "Fiber Optik Lab"}</span>
                   </div>
                 </div>
                 {/* Floating icon */}
@@ -1455,10 +1455,10 @@ export default function App() {
             <SectionLabel num="02" label="Kompetensi Keahlian" />
             <div className="flex flex-col md:flex-row gap-4 items-start mb-12">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight flex-1">
-                {siteContent.kompetensiTitle || "Dua Pilar Utama Jurusan"}
+                Dua Pilar Utama Jurusan
               </h2>
               <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed max-w-xs">
-                {siteContent.kompetensiSubtitle || "Kuasai dua bidang yang paling dibutuhkan industri teknologi saat ini dan masa depan."}
+                Kuasai dua bidang yang paling dibutuhkan industri teknologi saat ini dan masa depan.
               </p>
             </div>
 
@@ -1481,11 +1481,9 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
-                      {siteContent.kompetensiCards?.[0]?.title || "💻 Programming"}
-                    </h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">💻 Programming</h3>
                     <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-6">
-                      {siteContent.kompetensiCards?.[0]?.desc || "Kuasai pengembangan web, mobile, dan game dengan teknologi terkini. Dari backend Laravel hingga game Unity, kami siapkan kamu menjadi developer profesional."}
+                      Kuasai pengembangan web, mobile, dan game dengan teknologi terkini. Dari backend Laravel hingga game Unity, kami siapkan kamu menjadi developer profesional.
                     </p>
                     <div className="flex flex-wrap gap-2 mb-7">
                       {PROGRAMMING_TAGS.map(tag => <Tag key={tag} label={tag} red />)}
@@ -1521,12 +1519,10 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
-                      {siteContent.kompetensiCards?.[1]?.title || "🌐 Networking"}
-                    </h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">🌐 Networking</h3>
                     <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-6">
-                      {siteContent.kompetensiCards?.[1]?.desc || "Infrastruktur jaringan dari nol hingga enterprise. Konfigurasi router, switch, fiber optik, dan keamanan jaringan dengan perangkat Cisco dan MikroTik asli."}
-                    </p>
+                      Infrastruktur jaringan dari nol hingga enterprise. Konfigurasi router, switch, fiber optik, dan keamanan jaringan dengan perangkat Cisco dan MikroTik asli.
+m                    </p>
                     <div className="flex flex-wrap gap-2 mb-7">
                       {NETWORKING_TAGS.map(tag => <Tag key={tag} label={tag} green />)}
                     </div>
