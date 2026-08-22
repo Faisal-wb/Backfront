@@ -182,14 +182,14 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
   return (
     <div className="space-y-6">
       {saveSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+        <div className="fixed top-4 right-4 z-[100] p-4 rounded-xl bg-emerald-50 border border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-bold flex items-center gap-2 shadow-lg backdrop-blur-md">
           <Check size={16} />
           <span>Data Guru & Foto berhasil tersimpan permanen di Server!</span>
         </div>
       )}
 
       {saveError && (
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center gap-2">
+        <div className="fixed top-4 right-4 z-[100] p-4 rounded-xl bg-amber-50 border border-amber-500/30 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 text-xs font-bold flex items-center gap-2 shadow-lg backdrop-blur-md">
           <AlertTriangle size={16} />
           <span>{saveError}</span>
         </div>
