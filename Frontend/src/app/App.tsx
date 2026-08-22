@@ -1661,7 +1661,7 @@ m                    </p>
                     <div className="flex flex-col items-center">
                       <div className="group overflow-hidden rounded-2xl border border-slate-200 dark:border-white/\[0.08\] bg-white dark:bg-[#121215] shadow-md hover:shadow-xl dark:shadow-none transition-all duration-300 hover:-translate-y-1 w-full max-w-xs flex flex-col justify-between">
                         {/* Photo / Avatar Header */}
-                        <div className="h-52 sm:h-60 w-full relative overflow-hidden bg-slate-100 dark:bg-zinc-900/60 flex-shrink-0">
+                        <div className="h-72 sm:h-80 w-full relative overflow-hidden bg-slate-100 dark:bg-zinc-900/60 flex-shrink-0">
                           {headTeacher.image ? (
                             <img
                               src={headTeacher.image}
