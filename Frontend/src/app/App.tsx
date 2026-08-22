@@ -660,7 +660,6 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
     if (touchStart === null || touchEnd === null) return;
     const distance = touchStart - touchEnd;
     const minSwipeDistance = 50;
-
     if (distance > minSwipeDistance) {
       switchToRef.current((activeIdxRef.current + 1) % items.length);
     } else if (distance < -minSwipeDistance) {
@@ -668,32 +667,9 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
     }
   };
 
-  const [mouseStart, setMouseStart] = React.useState<number | null>(null);
+  // Mouse drag - use refs to avoid stale closure
+  const mouseStartRef = React.useRef<number | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setMouseStart(e.clientX);
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (mouseStart !== null && Math.abs(e.clientX - mouseStart) > 5) {
-      setIsDragging(true);
-    }
-  };
-
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (mouseStart === null) return;
-    const distance = mouseStart - e.clientX;
-    const minDragDistance = 50;
-    if (distance > minDragDistance) {
-      switchToRef.current((activeIdxRef.current + 1) % items.length);
-    } else if (distance < -minDragDistance) {
-      switchToRef.current((activeIdxRef.current - 1 + items.length) % items.length);
-    }
-    setMouseStart(null);
-    setIsDragging(false);
-  };
 
   const items = gallery.length > 0 ? gallery : [];
   const active = items[activeIdx];
@@ -716,6 +692,30 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
   activeIdxRef.current = activeIdx;
   const switchToRef = React.useRef(switchTo);
   switchToRef.current = switchTo;
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseStartRef.current = e.clientX;
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (mouseStartRef.current !== null && Math.abs(e.clientX - mouseStartRef.current) > 5) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (mouseStartRef.current === null) return;
+    const distance = mouseStartRef.current - e.clientX;
+    const minDragDistance = 50;
+    if (distance > minDragDistance) {
+      switchToRef.current((activeIdxRef.current + 1) % items.length);
+    } else if (distance < -minDragDistance) {
+      switchToRef.current((activeIdxRef.current - 1 + items.length) % items.length);
+    }
+    mouseStartRef.current = null;
+    setIsDragging(false);
+  };
 
   // Autoplay interval every 4 seconds (pauses on hover)
   React.useEffect(() => {
