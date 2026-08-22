@@ -8,7 +8,7 @@ import {
   Layers, Trophy, Shield, Code, Sun, Moon,
   ChevronLeft, ChevronRight, Terminal
 } from "lucide-react";
-import { fetchPublicContent, adminLogout } from "../services/api";
+import { fetchPublicContent, adminLogout, API_BASE_URL } from "../services/api";
 import { AdminLogin } from "../admin/AdminLogin";
 import { AdminLayout } from "../admin/AdminLayout";
 import { L3Preloader } from "../components/L3Preloader";
@@ -29,7 +29,18 @@ import imgTHP09774 from "../assets/TKJ/THP09774.webp";
 import imgTHP09787 from "../assets/TKJ/THP09787.webp";
 import imgTHP09790 from "../assets/TKJ/THP09790.webp";
 
-// â”€â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── DATA ─────────────────────────────────────────────────────────────────
+
+function resolveImageUrl(path: string | undefined, defaultImg: string) {
+  if (!path) return defaultImg;
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  if (path.startsWith('/api/')) {
+    // API_BASE_URL is 'https://lt3tjkt.smkthpati.sch.id/api'
+    const domain = API_BASE_URL.replace('/api', '');
+    return `${domain}${path}`;
+  }
+  return path;
+}
 
 const NAV_LINKS = [
   { label: "Beranda", href: "#home" },
@@ -1360,7 +1371,7 @@ export default function App() {
               <div className="relative pt-6 sm:pt-8">
                 <div className="relative z-10 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/[0.07] bg-slate-200 dark:bg-zinc-900 shadow-md dark:shadow-none">
                   <img
-                    src={siteContent.aboutImage1 || imgTHP09750}
+                    src={resolveImageUrl(siteContent.aboutImage1, imgTHP09750)}
                     alt="Siswa TJKT sesi coding workshop"
                     loading="lazy"
                     className="w-full object-cover"
@@ -1381,7 +1392,7 @@ export default function App() {
                 {/* Second smaller image offset */}
                 <div className="absolute -bottom-6 -right-6 z-20 w-40 h-28 rounded-xl overflow-hidden border-2 border-white dark:border-[#0c0c0e] bg-slate-200 dark:bg-zinc-900 shadow-2xl">
                   <img
-                    src={siteContent.aboutImage2 || imgTHP09774}
+                    src={resolveImageUrl(siteContent.aboutImage2, imgTHP09774)}
                     alt="Kabel jaringan fiber optik"
                     loading="lazy"
                     className="w-full h-full object-cover opacity-90 dark:opacity-80"
@@ -1399,27 +1410,26 @@ export default function App() {
               {/* Text */}
               <div>
                 <h2 className="text-3xl md:text-[2.6rem] font-black text-slate-900 dark:text-white mb-5 leading-[1.1] tracking-tight">
-                  Mencetak Talenta
+                  {siteContent.aboutTitle || "Tentang Jurusan TJKT"}
                   <br />
-                  <span className="text-slate-500 dark:text-zinc-500">Digital Siap Industri</span>
+                  <span className="text-slate-500 dark:text-zinc-500 text-[1.8rem] md:text-[2rem] leading-tight block mt-2">
+                    {siteContent.aboutSubtitle || "Mencetak Talenta Digital Siap Industri"}
+                  </span>
                 </h2>
-                <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-4">
-                  Jurusan Teknik Jaringan Komputer dan Telekomunikasi (TJKT) SMK Tunas Harapan Pati adalah pusat pendidikan vokasi unggulan yang mempersiapkan generasi teknologi Indonesia melalui dua pilar utama:
-                </p>
-                <p className="text-slate-700 dark:text-zinc-400 text-sm leading-relaxed mb-8">
-                  <strong className="text-slate-900 dark:text-white">Programming</strong> - pengembangan software, web, mobile, dan game. Dan <strong className="text-slate-900 dark:text-white">Networking</strong> - infrastruktur jaringan, keamanan siber, dan telekomunikasi fiber optik.
+                <p className="text-slate-600 dark:text-zinc-400 text-sm leading-relaxed mb-8 whitespace-pre-line">
+                  {siteContent.aboutDescription || "Jurusan Teknik Jaringan Komputer dan Telekomunikasi (TJKT) SMK Tunas Harapan Pati adalah pusat pendidikan vokasi unggulan yang mempersiapkan generasi teknologi Indonesia melalui dua pilar utama:\n\nProgramming - pengembangan software, web, mobile, dan game. Dan Networking - infrastruktur jaringan, keamanan siber, dan telekomunikasi fiber optik."}
                 </p>
 
                 {/* Highlight grid */}
-                <div className="grid grid-cols-2 gap-3 mb-8">
-                  {[
-                    { label: "Kurikulum Industri", dot: "red" },
-                    { label: "Sertifikasi Cisco & MikroTik", dot: "red" },
-                    { label: "Lab Fiber Optik Lengkap", dot: "emerald" },
-                    { label: "Teaching Factory TeFa", dot: "emerald" },
-                  ].map(({ label, dot }) => (
-                    <div key={label} className="flex items-center gap-2 text-sm text-slate-700 dark:text-zinc-400 font-medium dark:font-normal">
-                      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot === "red" ? "bg-red-500" : "bg-emerald-500"}`} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                  {(siteContent.aboutPoints || [
+                    "Kurikulum Industri",
+                    "Sertifikasi Cisco & MikroTik",
+                    "Lab Fiber Optik Lengkap",
+                    "Teaching Factory TeFa",
+                  ]).map((label, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm text-slate-700 dark:text-zinc-400 font-medium dark:font-normal">
+                      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${idx % 2 === 0 ? "bg-red-500" : "bg-emerald-500"}`} />
                       {label}
                     </div>
                   ))}
@@ -1445,10 +1455,10 @@ export default function App() {
             <SectionLabel num="02" label="Kompetensi Keahlian" />
             <div className="flex flex-col md:flex-row gap-4 items-start mb-12">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight flex-1">
-                Dua Pilar Utama Jurusan
+                {siteContent.kompetensiTitle || "Dua Pilar Utama Jurusan"}
               </h2>
               <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed max-w-xs">
-                Kuasai dua bidang yang paling dibutuhkan industri teknologi saat ini dan masa depan.
+                {siteContent.kompetensiSubtitle || "Kuasai dua bidang yang paling dibutuhkan industri teknologi saat ini dan masa depan."}
               </p>
             </div>
 
@@ -1458,7 +1468,7 @@ export default function App() {
                 <div className="relative">
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={siteContent.kompetensiImageProgramming || imgTHP09712}
+                      src={resolveImageUrl(siteContent.kompetensiImageProgramming, imgTHP09712)}
                       alt="Lab komputer pemrograman"
                       loading="lazy"
                       className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
@@ -1471,9 +1481,11 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">💻 Programming</h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
+                      {siteContent.kompetensiCards?.[0]?.title || "💻 Programming"}
+                    </h3>
                     <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-6">
-                      Kuasai pengembangan web, mobile, dan game dengan teknologi terkini. Dari backend Laravel hingga game Unity, kami siapkan kamu menjadi developer profesional.
+                      {siteContent.kompetensiCards?.[0]?.desc || "Kuasai pengembangan web, mobile, dan game dengan teknologi terkini. Dari backend Laravel hingga game Unity, kami siapkan kamu menjadi developer profesional."}
                     </p>
                     <div className="flex flex-wrap gap-2 mb-7">
                       {PROGRAMMING_TAGS.map(tag => <Tag key={tag} label={tag} red />)}
@@ -1496,7 +1508,7 @@ export default function App() {
                 <div className="relative">
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={siteContent.kompetensiImageNetworking || imgTHP09790}
+                      src={resolveImageUrl(siteContent.kompetensiImageNetworking, imgTHP09790)}
                       alt="Lab jaringan Cisco MikroTik"
                       loading="lazy"
                       className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
@@ -1509,9 +1521,11 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">🌐 Networking</h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
+                      {siteContent.kompetensiCards?.[1]?.title || "🌐 Networking"}
+                    </h3>
                     <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-6">
-                      Infrastruktur jaringan dari nol hingga enterprise. Konfigurasi router, switch, fiber optik, dan keamanan jaringan dengan perangkat Cisco dan MikroTik asli.
+                      {siteContent.kompetensiCards?.[1]?.desc || "Infrastruktur jaringan dari nol hingga enterprise. Konfigurasi router, switch, fiber optik, dan keamanan jaringan dengan perangkat Cisco dan MikroTik asli."}
                     </p>
                     <div className="flex flex-wrap gap-2 mb-7">
                       {NETWORKING_TAGS.map(tag => <Tag key={tag} label={tag} green />)}

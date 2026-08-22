@@ -1,6 +1,6 @@
 // React Frontend API Integration Service with Laravel Backend & Fallback
 
-const API_BASE_URL = 'https://lt3tjkt.smkthpati.sch.id/api';
+export const API_BASE_URL = 'https://lt3tjkt.smkthpati.sch.id/api';
 
 export interface StatItem {
   id?: number;
@@ -73,7 +73,10 @@ export async function fetchPublicContent() {
     const response = await fetch(`${API_BASE_URL}/content`, {
       headers: {
         'Accept': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
       },
+      cache: 'no-store',
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -218,7 +221,10 @@ export async function fetchSiteContentApi() {
     const response = await fetch(`${API_BASE_URL}/site-content`, {
       headers: {
         'Accept': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
       },
+      cache: 'no-store',
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
