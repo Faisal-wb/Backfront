@@ -393,7 +393,7 @@ function OverlakeFactsSection() {
             return (
               <SpotlightCard
                 key={i}
-                className="group p-6 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-white/[0.08] hover:border-red-500/40 dark:hover:border-red-500/30 transition-all duration-300 shadow-sm hover:shadow-xl dark:shadow-none flex flex-col justify-between"
+                className="group p-6 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-white/[0.08] hover:border-red-500/40 dark:hover:border-red-500/30 transition-all duration-300 shadow-sm hover:shadow-xl dark:shadow-none flex flex-col justify-between hover:-translate-y-2 hover:scale-[1.02]"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
