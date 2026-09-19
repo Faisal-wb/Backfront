@@ -1012,6 +1012,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    console.log("DEPLOY BERHASIL YEYYYY")
     if (isAdminView) return;
 
     const lenis = new Lenis({

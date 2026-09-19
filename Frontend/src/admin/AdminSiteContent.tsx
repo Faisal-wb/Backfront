@@ -145,7 +145,7 @@ const DEFAULT_SITE_CONTENT: SiteContentData = {
   // Beranda
   heroBadge: "LT3 MEDIA TJKT",
   heroHeadline1: "Teknik Jaringan",
-  heroHeadline2: "blabla",
+  heroHeadline2: "Komputer & Telekomunikasi",
   heroSubheadline: "Jadilah Ahli Network Engineer dan Software Developer Profesional dengan kurikulum berbasis industri dan lab standar internasional.",
   heroStats: [
     { label: "Siswa Aktif", value: "450", suffix: "" },
