@@ -1,4 +1,4 @@
-name: CI/CD
+name: Deploy Otomatis
 
 on:
   push:
@@ -9,8 +9,35 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy
+      - name: Deploy ke VPS
         run: |
           cd /var/www/lt3
+
+          echo "=== Git Pull ==="
           git pull origin main
-          docker compose up -d --build
+
+          echo "=== Backend ==="
+          cd /var/www/lt3/Backend
+
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+          php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+          echo "=== Frontend ==="
+          cd /var/www/lt3/Frontend
+
+          npm install
+          npm run build
+
+          echo "=== Permission ==="
+          sudo chown -R www-data:deploy /var/www/lt3
+          sudo chmod -R g+rwX /var/www/lt3
+
+          echo "=== Restart Services ==="
+          sudo systemctl restart php8.4-fpm
+          sudo systemctl reload nginx
+
+          echo "=== Deploy Selesai ==="
