@@ -6,11 +6,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploy
-        run: |
-          cd /var/www/lt3
-          git pull origin main
-          docker compose up -d --build
+      - name: Deploy ke VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /var/www/lt3
+            git pull origin main
+            chown -R www-data:www-data /var/www/lt3
+            chmod -R 755 /var/www/lt3
