@@ -1012,6 +1012,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    console.log("[App] Initial theme:", theme);
     if (isAdminView) return;
 
     const lenis = new Lenis({
@@ -1335,7 +1336,7 @@ export default function App() {
                         {siteContent.heroHeadline1 || "Teknik Jaringan"}
                       </span>
                       <span className="block text-slate-800 dark:text-zinc-200 font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl mt-1">
-                        {siteContent.heroHeadline2 || ""}
+                        {siteContent.heroHeadline2 || "Komputer & Telekomunikasi"}
                       </span>
                     </h1>
 
