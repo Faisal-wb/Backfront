@@ -1335,7 +1335,7 @@ export default function App() {
                         {siteContent.heroHeadline1 || "Teknik Jaringan"}
                       </span>
                       <span className="block text-slate-800 dark:text-zinc-200 font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl mt-1">
-                        {siteContent.heroHeadline2 || "Komputer & Telekomunikasi"}
+                        {siteContent.heroHeadline2 || ""}
                       </span>
                     </h1>
 
