@@ -1012,7 +1012,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    console.log("[App] Initial theme:", theme);
     if (isAdminView) return;
 
     const lenis = new Lenis({
