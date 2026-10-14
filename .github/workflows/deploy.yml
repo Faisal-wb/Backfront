@@ -22,16 +22,15 @@ jobs:
           echo "=== Backend ==="
           cd /var/www/lt3/Backend
 
-          # Update password admin langsung via Tinker menggunakan secret dari GitHub
-          export NEW_PASS="${ADMIN_NEW_PASS:-$ADMIN_DEFAULT_PASSWORD}"
-          if [ -n "$NEW_PASS" ]; then
-            echo "Mengupdate password admin di MySQL VPS..."
-            php artisan tinker --execute="\$p = trim(getenv('NEW_PASS')); if(!empty(\$p)) { \$u = App\Models\User::where('name', 'admin')->orWhere('email', 'admin@tjkt.sch.id')->first(); if(\$u) { \$u->password = Hash::make(\$p); \$u->save(); echo 'Password admin berhasil diupdate di database!'; } }"
+          echo "=== Update Admin Password ==="
+          PASS_INPUT="${ADMIN_NEW_PASS:-$ADMIN_DEFAULT_PASSWORD}"
+          if [ -n "$PASS_INPUT" ]; then
+            php artisan admin:set-password "$PASS_INPUT"
 
             if grep -q "^ADMIN_DEFAULT_PASSWORD=" .env; then
-              sed -i "s|^ADMIN_DEFAULT_PASSWORD=.*|ADMIN_DEFAULT_PASSWORD=$NEW_PASS|" .env
+              sed -i "s|^ADMIN_DEFAULT_PASSWORD=.*|ADMIN_DEFAULT_PASSWORD=$PASS_INPUT|" .env
             else
-              echo "ADMIN_DEFAULT_PASSWORD=$NEW_PASS" >> .env
+              echo "ADMIN_DEFAULT_PASSWORD=$PASS_INPUT" >> .env
             fi
           fi
 
