@@ -10,6 +10,8 @@ jobs:
 
     steps:
       - name: Deploy ke VPS
+        env:
+          ADMIN_DEFAULT_PASSWORD: ${{ secrets.ADMIN_DEFAULT_PASSWORD }}
         run: |
           cd /var/www/lt3
 
@@ -19,7 +21,19 @@ jobs:
           echo "=== Backend ==="
           cd /var/www/lt3/Backend
 
+          # Update ADMIN_DEFAULT_PASSWORD ke .env di VPS jika diset di GitHub Secrets
+          if [ -n "$ADMIN_DEFAULT_PASSWORD" ]; then
+            if grep -q "^ADMIN_DEFAULT_PASSWORD=" .env; then
+              sed -i "s|^ADMIN_DEFAULT_PASSWORD=.*|ADMIN_DEFAULT_PASSWORD=$ADMIN_DEFAULT_PASSWORD|" .env
+            else
+              echo "ADMIN_DEFAULT_PASSWORD=$ADMIN_DEFAULT_PASSWORD" >> .env
+            fi
+          fi
+
           composer install --no-interaction --prefer-dist --optimize-autoloader
+
+          echo "=== Run Migrations ==="
+          php artisan migrate --force
 
           php artisan optimize:clear
           php artisan config:cache

@@ -173,7 +173,8 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@tjkt.sch.id'],
             [
                 'name' => 'admin',
-                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+                'password' => \Illuminate\Support\Facades\Hash::make(env('ADMIN_DEFAULT_PASSWORD')),
+
             ]
         );
     }
