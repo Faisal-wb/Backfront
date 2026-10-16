@@ -14,6 +14,7 @@ import { AdminLayout } from "../admin/AdminLayout";
 import { L3Preloader } from "../components/L3Preloader";
 import { LandoImageReveal } from "../components/LandoImageReveal";
 import { loadSiteContent, loadSiteContentAsync, SiteContentData } from "../admin/AdminSiteContent";
+import { BinaryLabPage } from "../components/BinaryLab/BinaryLabPage";
 
 
 import logoLT3 from "../assets/logo_lt3.webp";
@@ -891,7 +892,16 @@ export default function App() {
   const [isAdminView, setIsAdminView] = useState(() =>
     typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.hash === "#admin")
   );
-  const [isAdminLogged, setIsAdminLogged] = useState(() => typeof window !== "undefined" && localStorage.getItem("tjkt_admin_logged") === "true");
+  const [isAdminLogged, setIsAdminLogged] = useState(() => 
+    typeof window !== "undefined" && 
+    Boolean(localStorage.getItem("tjkt_admin_token")) && 
+    localStorage.getItem("tjkt_admin_logged") === "true"
+  );
+
+  // Binary Lab (BitLab TJKT) view state
+  const [isBinaryLabView, setIsBinaryLabView] = useState(() =>
+    typeof window !== "undefined" && (window.location.pathname.startsWith("/lab") || window.location.pathname.startsWith("/lab-biner"))
+  );
 
   // Site Content & Navigation state (editable from Admin CMS)
   // Inisialisasi sinkron dari localStorage (teks), lalu hydrate gambar dari IndexedDB secara async
@@ -934,14 +944,15 @@ export default function App() {
 
   useEffect(() => {
     const handleLocationChange = () => {
-      const isAdmin = window.location.pathname.startsWith("/admin") || window.location.hash === "#admin";
+      const isAdmin = window.location.pathname.startsWith("/admin");
       setIsAdminView(isAdmin);
+
+      const isLab = window.location.pathname.startsWith("/lab") || window.location.pathname.startsWith("/lab-biner");
+      setIsBinaryLabView(isLab);
     };
     handleLocationChange();
-    window.addEventListener("hashchange", handleLocationChange);
     window.addEventListener("popstate", handleLocationChange);
     return () => {
-      window.removeEventListener("hashchange", handleLocationChange);
       window.removeEventListener("popstate", handleLocationChange);
     };
   }, []);
@@ -983,16 +994,13 @@ export default function App() {
 
   const currentHeroSlide = HERO_SLIDES[heroIdx];
 
-  // Theme state: light or dark
+  // Theme state: light or dark (Default utama: "light" / putih-merah)
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tjkt_theme");
       if (saved === "dark" || saved === "light") return saved;
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
-        return "light";
-      }
     }
-    return "dark";
+    return "light";
   });
 
   useEffect(() => {
@@ -1088,6 +1096,18 @@ export default function App() {
   }, []);
 
 
+  // Render Standalone Binary Lab View if /lab-biner or /lab
+  if (isBinaryLabView) {
+    return (
+      <BinaryLabPage
+        onBackToSite={() => {
+          window.history.pushState(null, "", "/");
+          setIsBinaryLabView(false);
+        }}
+      />
+    );
+  }
+
   // Render Admin View if #admin or isAdminView is true
   if (isAdminView) {
     if (!isAdminLogged) {
@@ -1107,6 +1127,8 @@ export default function App() {
         onLogout={() => {
           adminLogout();
           localStorage.removeItem("tjkt_admin_logged");
+          localStorage.removeItem("tjkt_admin_token");
+          localStorage.removeItem("tjkt_admin_user");
           setIsAdminLogged(false);
           window.history.pushState(null, "", "/admin");
         }}
@@ -1232,6 +1254,18 @@ export default function App() {
                 )}
               </button>
 
+              {/* BitLab Button — opens in new window/tab */}
+              <a
+                href="/lab-biner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 text-[11px] sm:text-[12px] font-bold transition-all duration-200 shadow-sm cursor-pointer"
+                title="Buka BitLab - Simulator Biner Interaktif di Tab Baru"
+              >
+                <Zap size={13} className="text-red-500 animate-pulse" />
+                <span>BitLab</span>
+              </a>
+
               {/* PPDB Button */}
               <a
                 href={siteContent.primaryCtaUrl || "https://ppdb.smkthpati.sch.id/"}
@@ -1287,11 +1321,27 @@ export default function App() {
                 </button>
               </div>
               <a
+                href="/lab-biner"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="mt-1 flex items-center justify-between px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm font-bold"
+              >
+                <span className="flex items-center gap-2">
+                  <Zap size={15} className="text-red-500" />
+                  <span>BitLab TJKT (Simulasi Biner)</span>
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-red-500/20 text-red-500 font-mono">
+                  Buka Tab ↗
+                </span>
+              </a>
+
+              <a
                 href={siteContent.primaryCtaUrl || "https://ppdb.smkthpati.sch.id/"}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="mt-1 text-center px-5 py-2.5 rounded-full bg-red-600 text-white text-sm font-semibold hover:bg-red-500 transition-colors"
+                className="text-center px-5 py-2.5 rounded-full bg-red-600 text-white text-sm font-semibold hover:bg-red-500 transition-colors"
               >
                 {siteContent.primaryCtaText || "Daftar PPDB"}
               </a>
@@ -2002,18 +2052,6 @@ m                    </p>
                 © 2026 TJKT SMK Tunas Harapan Pati · All rights reserved
               </p>
               <div className="flex items-center gap-4 text-zinc-400 text-[11px]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                <a
-                  href="/admin"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.history.pushState(null, "", "/admin");
-                    setIsAdminView(true);
-                  }}
-                  className="hover:text-red-400 transition-colors cursor-pointer"
-                >
-                  Admin Portal
-                </a>
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                 <span>Teknik Jaringan Komputer dan Telekomunikasi</span>
               </div>
             </div>

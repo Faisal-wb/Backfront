@@ -59,7 +59,13 @@ class SiteSettingController extends Controller
                 $base64Image = $payload[$field];
                 
                 // Extract extension
-                $extension = explode('/', explode(':', substr($base64Image, 0, strpos($base64Image, ';')))[1])[1];
+                $extension = strtolower(explode('/', explode(':', substr($base64Image, 0, strpos($base64Image, ';')))[1])[1]);
+
+                // Whitelist allowed image extensions only — prevent PHP/script injection
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                if (!in_array($extension, $allowedExtensions, true)) {
+                    continue; // Skip field jika ekstensi tidak diizinkan
+                }
                 
                 // Remove the "data:image/xxx;base64," part
                 $image = substr($base64Image, strpos($base64Image, ',') + 1); 

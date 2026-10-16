@@ -1,16 +1,29 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TJKT · SMK Tunas Harapan Pati</title>
     <meta name="description" content="This platform serves as an official hub for the Computer Networking and Telecommunications department, offering vital information, showcasing achievements, and promoting enrollment for prospective students and parents." />
     <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/webp" href="/assets/logo_lt3-C_UzZlGL.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        var saved = localStorage.getItem("tjkt_theme");
+        if (saved === "dark") {
+          document.documentElement.classList.add("dark");
+          document.documentElement.classList.remove("light");
+        } else {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
     <style>
-      html, body { height: 100%; margin: 0; font-family: 'Inter', sans-serif; background: #0d0d0d; }
+      html, body { height: 100%; margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: #0d0d0d; }
       #root { height: 100%; }
       #l3-initial-preloader {
         position: fixed;
@@ -76,11 +89,11 @@
       }
     </style>
 
-    <script type="module" crossorigin src="/assets/index-BkQ3-H--.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-y6plU51f.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-BJ3h9LwG.js">
+    <script type="module" crossorigin src="/assets/index-CsSs_-IK.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-D8or29y6.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-BXH5vpPk.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-motion-8CtkdKCq.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-qIFOny8X.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BkDDX8T6.css">
   </head>
 
   <body>
@@ -111,7 +124,7 @@
           path.style.setProperty('--len', len);
         } catch(e) {}
       });
-    </script>
+    </script>
     
   </body>
 </html>
