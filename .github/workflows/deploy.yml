@@ -17,6 +17,7 @@ jobs:
           cd /var/www/lt3
 
           echo "=== Git Pull ==="
+          git reset --hard HEAD
           git pull origin main
 
           echo "=== Backend ==="
