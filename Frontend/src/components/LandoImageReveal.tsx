@@ -5,6 +5,8 @@ interface LandoImageRevealProps {
   imgLT3: string;
   alt1?: string;
   altLT3?: string;
+  fallbackImg1?: string;
+  fallbackImgLT3?: string;
 }
 
 interface LiquidParticle {
@@ -22,6 +24,8 @@ export const LandoImageReveal: React.FC<LandoImageRevealProps> = ({
   imgLT3,
   alt1 = "Gambar 1 TJKT",
   altLT3 = "Gambar LT3 Media",
+  fallbackImg1,
+  fallbackImgLT3,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -226,6 +230,12 @@ export const LandoImageReveal: React.FC<LandoImageRevealProps> = ({
         <img
           src={img1}
           alt={alt1}
+          onError={(e) => {
+            if (fallbackImg1 && e.currentTarget.src !== fallbackImg1) {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackImg1;
+            }
+          }}
           className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
         />
       </div>
@@ -242,6 +252,12 @@ export const LandoImageReveal: React.FC<LandoImageRevealProps> = ({
         <img
           src={imgLT3}
           alt={altLT3}
+          onError={(e) => {
+            if (fallbackImgLT3 && e.currentTarget.src !== fallbackImgLT3) {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackImgLT3;
+            }
+          }}
           className="w-full h-full object-cover object-center scale-[1.04] transition-transform duration-300"
         />
       </div>

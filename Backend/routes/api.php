@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\SiteSettingController;
 */
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
     // Whitelist allowed storage folders strictly
-    $allowedFolders = ['gallery', 'teachers', 'achievements', 'site', 'content'];
+    $allowedFolders = ['gallery', 'teachers', 'achievements', 'site_content', 'site', 'content'];
     if (!in_array($folder, $allowedFolders, true)) {
         abort(404);
     }

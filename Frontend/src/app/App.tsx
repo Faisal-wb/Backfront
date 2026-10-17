@@ -1437,9 +1437,10 @@ export default function App() {
               {/* RIGHT COLUMN: Lando Norris Style Interactive Image Reveal Card */}
               <div className="lg:col-span-6 xl:col-span-5 h-full min-h-[480px]">
                 <LandoImageReveal
-                  img1={siteContent.heroImage1 || imgTHP09774}
-                  imgLT3={siteContent.heroImage2 || imgTHP09790}
-                  logoLT3={logoLT3}
+                  img1={resolveImageUrl(siteContent.heroImage1, imgTHP09774)}
+                  imgLT3={resolveImageUrl(siteContent.heroImage2, imgTHP09790)}
+                  fallbackImg1={imgTHP09774}
+                  fallbackImgLT3={imgTHP09790}
                   alt1="Lab TJKT Utama (Gambar 1)"
                   altLT3="LT3 Media TJKT (Gambar LT3)"
                 />
@@ -1467,6 +1468,12 @@ export default function App() {
                     src={resolveImageUrl(siteContent.aboutImage1, imgTHP09750)}
                     alt="Siswa TJKT sesi coding workshop"
                     loading="lazy"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== imgTHP09750) {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = imgTHP09750;
+                      }
+                    }}
                     className="w-full object-cover"
                     style={{ height: "420px" }}
                   />
@@ -1488,6 +1495,12 @@ export default function App() {
                     src={resolveImageUrl(siteContent.aboutImage2, imgTHP09774)}
                     alt="Kabel jaringan fiber optik"
                     loading="lazy"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== imgTHP09774) {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = imgTHP09774;
+                      }
+                    }}
                     className="w-full h-full object-cover opacity-90 dark:opacity-80"
                   />
                   <div className="absolute inset-0 flex items-end p-2 bg-gradient-to-t from-black/80 to-transparent">
@@ -1564,6 +1577,12 @@ export default function App() {
                       src={resolveImageUrl(siteContent.kompetensiImageProgramming, imgTHP09712)}
                       alt="Lab komputer pemrograman"
                       loading="lazy"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== imgTHP09712) {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = imgTHP09712;
+                        }
+                      }}
                       className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#0e0e10]" />
@@ -1602,6 +1621,12 @@ export default function App() {
                       src={resolveImageUrl(siteContent.kompetensiImageNetworking, imgTHP09790)}
                       alt="Lab jaringan Cisco MikroTik"
                       loading="lazy"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== imgTHP09790) {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = imgTHP09790;
+                        }
+                      }}
                       className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#0e0e10]" />
