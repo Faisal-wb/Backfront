@@ -2027,22 +2027,31 @@ m                    </p>
               {/* Map placeholder — 3 cols */}
               <div className="md:col-span-3">
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Inter', sans-serif" }}>Lokasi</h4>
-                <div className="w-full h-32 rounded-xl overflow-hidden border border-white/10 bg-white/[0.03] relative shadow-md">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                    <MapPin size={20} className="text-red-500" />
-                    <span className="text-zinc-300 text-xs text-center font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
-                      SMK Tunas Harapan Pati
-                      <br />
-                      <span className="text-zinc-400">Jl. P. Sudirman No.1</span>
-                    </span>
-                  </div>
-                  <div
-                    className="absolute inset-0 opacity-[0.12]"
-                    style={{
-                      backgroundImage: "linear-gradient(rgba(220,38,38,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(220,38,38,0.4) 1px, transparent 1px)",
-                      backgroundSize: "20px 20px",
-                    }}
+                <div className="relative w-full h-56 rounded-xl overflow-hidden border border-white/10 shadow-md group">
+                  <iframe
+                    title="Lokasi SMK Tunas Harapan Pati"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.138356983802!2d111.0427843!3d-6.7530182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e70d313a5b1129d%3A0xde1baf5be57d6a4f!2sSMK%20Tunas%20Harapan%20Pati!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(120%)" }}
+                    allowFullScreen={false}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="w-full h-full pointer-events-none opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                   />
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=SMK+Tunas+Harapan+Pati"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 bg-black/40 group-hover:bg-black/20 flex flex-col items-center justify-center gap-1 transition-all duration-300 cursor-pointer p-2"
+                  >
+                    <div className="flex items-center gap-1.5 bg-zinc-900/90 border border-white/10 px-3 py-1.5 rounded-lg group-hover:border-red-500/50 group-hover:scale-105 transition-all duration-300">
+                      <MapPin size={16} className="text-red-500" />
+                      <span className="text-white text-xs font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+                        SMK Tunas Harapan Pati ↗
+                      </span>
+                    </div>
+                  </a>
                 </div>
               </div>
             </div>
