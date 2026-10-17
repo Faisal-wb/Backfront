@@ -17,8 +17,11 @@ jobs:
           cd /var/www/lt3
 
           echo "=== Git Pull ==="
+          rm -rf Frontend/dist
+          git clean -fd
           git reset --hard HEAD
-          git pull origin main
+          git fetch origin main
+          git reset --hard origin/main
 
           echo "=== Backend ==="
           cd /var/www/lt3/Backend
