@@ -192,7 +192,7 @@ function Tag({ label, green, red }: { label: string; green?: boolean; red?: bool
         ? "border-red-500/30 bg-red-500/10 text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-400 hover:bg-red-500/20"
         : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-white/20"
         }`}
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {label}
     </span>
@@ -215,9 +215,9 @@ function TierBadge({ tier, result }: { tier: string; result: string }) {
 function SectionLabel({ num, label }: { num: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-4">
-      <span className="text-xs font-black text-red-600/70 dark:text-red-600/50" style={{ fontFamily: "'Inter', sans-serif" }}>{num}</span>
+      <span className="text-xs font-black text-red-600/70 dark:text-red-600/50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{num}</span>
       <div className="h-px w-8 bg-red-600/40 dark:bg-red-600/30" />
-      <span className="text-xs tracking-[0.2em] uppercase text-slate-500 dark:text-zinc-600 font-semibold" style={{ fontFamily: "'Inter', sans-serif" }}>{label}</span>
+      <span className="text-xs tracking-[0.2em] uppercase text-slate-500 dark:text-zinc-600 font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{label}</span>
     </div>
   );
 }
@@ -236,7 +236,7 @@ function StatCard({ value, label, suffix, active, Icon }: {
         <span className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight tabular-nums">
           {count}{suffix}
         </span>
-        <p className="text-xs tracking-[0.14em] uppercase text-slate-500 dark:text-zinc-600 font-semibold mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>{label}</p>
+        <p className="text-xs tracking-[0.14em] uppercase text-slate-500 dark:text-zinc-600 font-semibold mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{label}</p>
       </div>
     </div>
   );
@@ -252,7 +252,7 @@ function WindowCard({ title, accent, children }: { title: string; accent?: strin
         <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60 dark:bg-yellow-500/35" />
         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/60 dark:bg-emerald-500/35" />
         <div className="flex-1 flex justify-center">
-          <span className="text-[11px] text-slate-500 dark:text-zinc-700 font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>{title}</span>
+          <span className="text-[11px] text-slate-500 dark:text-zinc-700 font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{title}</span>
         </div>
       </div>
       {children}
@@ -331,6 +331,31 @@ function SpotlightCard({ children, className = "" }: { children: React.ReactNode
         }}
       />
       {children}
+    </div>
+  );
+}
+
+// ─── BITLAB CALL TO ACTION ─────────────────────────────────────────────────
+
+function BitLabSimpleCta() {
+  return (
+    <div className="mt-5 p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
+        <p className="text-sm text-slate-700 dark:text-zinc-300">
+          Pelajari logika biner dan perhitungan subnetting jaringan secara interaktif di <span className="font-semibold text-slate-900 dark:text-white">BitLab</span>.
+        </p>
+      </div>
+
+      <a
+        href="/lab-biner"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-semibold tracking-wide transition-colors shrink-0"
+      >
+        <span>Buka BitLab</span>
+        <ArrowRight size={14} />
+      </a>
     </div>
   );
 }
@@ -424,6 +449,9 @@ function OverlakeFactsSection() {
             );
           })}
         </div>
+
+        {/* ── BITLAB SIMPLE CTA ── */}
+        <BitLabSimpleCta />
       </div>
     </section>
   );
@@ -450,7 +478,7 @@ function MarqueeTicker() {
               <div key={idx} className="flex items-center gap-8">
                 <span
                   className="text-xs md:text-sm font-black tracking-[0.25em] text-white/90 uppercase transition-colors hover:text-red-500"
-                  style={{ fontFamily: "'Inter', sans-serif" }}
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
                   {text}
                 </span>
@@ -604,36 +632,7 @@ function FluidCanvasCursor() {
 
 
 
-function LiveStatusPill() {
-  const [timeStr, setTimeStr] = useState("");
 
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeStr(
-        now.toLocaleTimeString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }) + " WIB"
-      );
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="fixed bottom-4 left-4 z-40 hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/85 backdrop-blur-md border border-white/10 shadow-lg text-[11px] font-mono text-white/80 select-none">
-      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
-      <span className="font-bold tracking-wider text-white">LT3 LIVE</span>
-      <span className="text-white/30">•</span>
-      <span className="text-white/70">PATI, ID</span>
-      <span className="text-white/30">•</span>
-      <span className="text-red-400 font-semibold">{timeStr}</span>
-    </div>
-  );
-}
 
 // â”€â”€â”€ GALLERY SECTION (Hacienda style) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -760,9 +759,9 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
         <div className="flex items-center gap-3">
           <span className="text-xs font-black text-white/40 tracking-[0.2em]">05</span>
           <div className="h-px w-8 bg-white/20" />
-          <span className="text-xs tracking-[0.2em] uppercase text-white/40 font-semibold" style={{ fontFamily: "'Inter', sans-serif" }}>GALERI KEGIATAN</span>
+          <span className="text-xs tracking-[0.2em] uppercase text-white/40 font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>GALERI KEGIATAN</span>
         </div>
-        <p className="text-white/30 text-xs max-w-[200px] text-right leading-relaxed hidden md:block" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <p className="text-white/30 text-xs max-w-[200px] text-right leading-relaxed hidden md:block" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           Momen &amp; Aktivitas TJKT
         </p>
       </div>
@@ -823,7 +822,7 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
               <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]" />
               <p
                 className="text-white/70 text-xs sm:text-sm font-extrabold tracking-[0.2em] uppercase"
-                style={{ fontFamily: "'Inter', sans-serif" }}
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 {String(activeIdx + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
               </p>
@@ -831,7 +830,7 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
             <h2
               className="text-white font-extrabold leading-tight tracking-tight drop-shadow-lg"
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontSize: "clamp(1.5rem, 3.5vw, 3.25rem)",
                 lineHeight: "1.15",
                 opacity: animating ? 0 : 1,
@@ -1162,7 +1161,6 @@ export default function App() {
   return (
     <>
       <FluidCanvasCursor />
-      <LiveStatusPill />
 
 
 
@@ -1221,26 +1219,6 @@ export default function App() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Social Icons */}
-              <a
-                href="https://www.instagram.com/media.tjkt"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram TJKT"
-                className="hidden sm:flex p-2 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/[0.05] text-slate-600 dark:text-zinc-400 hover:text-pink-500 dark:hover:text-pink-400 hover:border-pink-400/40 hover:bg-pink-50 dark:hover:bg-pink-500/10 transition-all duration-200 items-center justify-center cursor-pointer"
-              >
-                <Instagram size={14} />
-              </a>
-              <a
-                href="https://www.tiktok.com/@media.tjkt"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok TJKT"
-                className="hidden sm:flex p-2 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/[0.05] text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:border-white/20 hover:bg-slate-200/80 dark:hover:bg-white/10 transition-all duration-200 items-center justify-center cursor-pointer"
-              >
-                <TikTokIcon size={14} />
-              </a>
-
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -1254,17 +1232,6 @@ export default function App() {
                 )}
               </button>
 
-              {/* BitLab Button — opens in new window/tab */}
-              <a
-                href="/lab-biner"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 text-[11px] sm:text-[12px] font-bold transition-all duration-200 shadow-sm cursor-pointer"
-                title="Buka BitLab - Simulator Biner Interaktif di Tab Baru"
-              >
-                <Zap size={13} className="text-red-500 animate-pulse" />
-                <span>BitLab</span>
-              </a>
 
               {/* PPDB Button */}
               <a
@@ -1422,7 +1389,7 @@ export default function App() {
                         <span className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight tabular-nums drop-shadow-sm">
                           {s.value}{s.suffix}
                         </span>
-                        <span className="text-xs sm:text-sm font-bold text-red-100 uppercase tracking-wider mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                        <span className="text-xs sm:text-sm font-bold text-red-100 uppercase tracking-wider mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                           {s.label}
                         </span>
                       </div>
@@ -1484,7 +1451,7 @@ export default function App() {
                       <p className="text-white font-bold text-sm">{siteContent.aboutImage1Caption || "Lab Pemrograman & Jaringan"}</p>
                       <p className="text-zinc-300 dark:text-zinc-400 text-xs mt-0.5">{siteContent.aboutImage1Subcaption || "Fasilitas modern siap industri"}</p>
                     </div>
-                    <div className="px-3 py-1.5 rounded-full bg-red-600/90 text-white text-xs font-semibold" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    <div className="px-3 py-1.5 rounded-full bg-red-600/90 text-white text-xs font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       TJKT SMK TH
                     </div>
                   </div>
@@ -1504,7 +1471,7 @@ export default function App() {
                     className="w-full h-full object-cover opacity-90 dark:opacity-80"
                   />
                   <div className="absolute inset-0 flex items-end p-2 bg-gradient-to-t from-black/80 to-transparent">
-                    <span className="text-white text-[10px] font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>{siteContent.aboutImage2Caption || "Fiber Optik Lab"}</span>
+                    <span className="text-white text-[10px] font-bold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{siteContent.aboutImage2Caption || "Fiber Optik Lab"}</span>
                   </div>
                 </div>
                 {/* Floating icon */}
@@ -1593,7 +1560,10 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">💻 Programming</h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 flex items-center gap-2.5">
+                      <Monitor size={22} className="text-red-600 dark:text-red-400" />
+                      <span>Programming</span>
+                    </h3>
                     <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-6">
                       Kuasai pengembangan web, mobile, dan game dengan teknologi terkini. Dari backend Laravel hingga game Unity, kami siapkan kamu menjadi developer profesional.
                     </p>
@@ -1604,7 +1574,7 @@ export default function App() {
                       {[["Web Dev", "Laravel/PHP"], ["Mobile", "Android/iOS"], ["Game Dev", "Unity/C#"]].map(([t, s]) => (
                         <div key={t} className="text-center">
                           <div className="text-slate-900 dark:text-white font-bold text-sm">{t}</div>
-                          <div className="text-slate-500 dark:text-zinc-700 text-[10px] mt-0.5" style={{ fontFamily: "'Inter', sans-serif" }}>{s}</div>
+                          <div className="text-slate-500 dark:text-zinc-700 text-[10px] mt-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s}</div>
                         </div>
                       ))}
                     </div>
@@ -1637,10 +1607,13 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">🌐 Networking</h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 flex items-center gap-2.5">
+                      <Wifi size={22} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>Networking</span>
+                    </h3>
                     <p className="text-slate-600 dark:text-zinc-500 text-sm leading-relaxed mb-6">
                       Infrastruktur jaringan dari nol hingga enterprise. Konfigurasi router, switch, fiber optik, dan keamanan jaringan dengan perangkat Cisco dan MikroTik asli.
-m                    </p>
+                    </p>
                     <div className="flex flex-wrap gap-2 mb-7">
                       {NETWORKING_TAGS.map(tag => <Tag key={tag} label={tag} green />)}
                     </div>
@@ -1648,7 +1621,7 @@ m                    </p>
                       {[["Routing", "Cisco/MikroTik"], ["Fiber Optic", "Splicing OTDR"], ["Security", "Network Sec"]].map(([t, s]) => (
                         <div key={t} className="text-center">
                           <div className="text-slate-900 dark:text-white font-bold text-sm">{t}</div>
-                          <div className="text-slate-500 dark:text-zinc-700 text-[10px] mt-0.5" style={{ fontFamily: "'Inter', sans-serif" }}>{s}</div>
+                          <div className="text-slate-500 dark:text-zinc-700 text-[10px] mt-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s}</div>
                         </div>
                       ))}
                     </div>
@@ -1678,7 +1651,7 @@ m                    </p>
                   className="group p-7 bg-white dark:bg-[#0c0c0e] hover:bg-slate-50 dark:hover:bg-[#131315] transition-colors duration-300 relative overflow-hidden"
                 >
                   <div className="absolute top-0 left-0 w-12 h-[1px] bg-red-600/0 group-hover:bg-red-600/50 group-hover:w-full transition-all duration-500" />
-                  <div className="absolute top-4 right-4 text-[10px] text-slate-300 dark:text-zinc-800 font-black" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <div className="absolute top-4 right-4 text-[10px] text-slate-300 dark:text-zinc-800 font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     0{i + 1}
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4 group-hover:bg-red-500/20 group-hover:border-red-500/30 transition-all duration-300">
@@ -1720,7 +1693,7 @@ m                    </p>
                       <div className="flex items-center justify-between mb-4">
                         <span
                           className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-600 bg-slate-100 dark:bg-zinc-900"
-                          style={{ fontFamily: "'Inter', sans-serif" }}
+                          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                         >
                           {p.year}
                         </span>
@@ -1734,7 +1707,7 @@ m                    </p>
                           <h4 className="text-slate-900 dark:text-white font-bold text-sm leading-snug">{p.event}</h4>
                           <div className="flex items-center gap-1.5 mt-1.5">
                             <Trophy size={11} className="text-slate-400 dark:text-zinc-700" />
-                            <span className="text-xs text-slate-500 dark:text-zinc-600" style={{ fontFamily: "'Inter', sans-serif" }}>
+                            <span className="text-xs text-slate-500 dark:text-zinc-600" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                               SMK Tunas Harapan Pati
                             </span>
                           </div>
@@ -1811,7 +1784,7 @@ m                    </p>
                             </p>
                           </div>
                           <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 tracking-wider uppercase" style={{ fontFamily: "'Inter', sans-serif" }}>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 tracking-wider uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                               SMK TH PATI
                             </span>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 font-mono font-bold">
@@ -1874,7 +1847,7 @@ m                    </p>
                                 </p>
                               </div>
                               <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-between">
-                                <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 tracking-wider uppercase" style={{ fontFamily: "'Inter', sans-serif" }}>
+                                <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 tracking-wider uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                   SMK TH PATI
                                 </span>
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 font-mono">
@@ -1925,7 +1898,7 @@ m                    </p>
               <div className="relative z-10 text-center py-20 md:py-24 px-8">
                 <span
                   className="inline-block px-4 py-1.5 rounded-full text-[11px] tracking-[0.2em] uppercase text-red-300 border border-red-400/20 bg-red-400/8 mb-6"
-                  style={{ fontFamily: "'Inter', sans-serif" }}
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 >
                   PPDB 2027 / 2028
                 </span>
@@ -1980,7 +1953,7 @@ m                    </p>
                   </div>
                   <div>
                     <div className="text-sm font-black text-white leading-none font-mono tracking-wider">LT3 MEDIA TJKT</div>
-                    <div className="text-[10px] text-zinc-400 leading-none mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    <div className="text-[10px] text-zinc-400 leading-none mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       SMK Tunas Harapan Pati · Teknik Jaringan Komputer &amp; Telekomunikasi
                     </div>
                   </div>
@@ -2020,7 +1993,7 @@ m                    </p>
 
               {/* Navigation — 2 cols */}
               <div className="md:col-span-2">
-                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Inter', sans-serif" }}>Navigasi</h4>
+                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Navigasi</h4>
                 <ul className="space-y-3">
                   {[...NAV_LINKS, { label: "PPDB 2027 ", href: "https://ppdb.smkthpati.sch.id/" }].map(l => (
                     <li key={l.href}>
@@ -2032,7 +2005,7 @@ m                    </p>
 
               {/* Contact — 3 cols */}
               <div className="md:col-span-3">
-                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Inter', sans-serif" }}>Kontak</h4>
+                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kontak</h4>
                 <ul className="space-y-3.5">
                   <li className="flex items-start gap-2.5 text-zinc-400 text-sm">
                     <MapPin size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
@@ -2051,7 +2024,7 @@ m                    </p>
 
               {/* Map placeholder — 3 cols */}
               <div className="md:col-span-3">
-                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Inter', sans-serif" }}>Lokasi</h4>
+                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Lokasi</h4>
                 <div className="relative w-full h-56 rounded-xl overflow-hidden border border-white/10 shadow-md group">
                   <iframe
                     title="Lokasi SMK Tunas Harapan Pati"
@@ -2072,7 +2045,7 @@ m                    </p>
                   >
                     <div className="flex items-center gap-1.5 bg-zinc-900/90 border border-white/10 px-3 py-1.5 rounded-lg group-hover:border-red-500/50 group-hover:scale-105 transition-all duration-300">
                       <MapPin size={16} className="text-red-500" />
-                      <span className="text-white text-xs font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      <span className="text-white text-xs font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                         SMK Tunas Harapan Pati ↗
                       </span>
                     </div>
@@ -2082,10 +2055,10 @@ m                    </p>
             </div>
 
             <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-zinc-400 text-[11px]" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="text-zinc-400 text-[11px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 © 2026 TJKT SMK Tunas Harapan Pati · All rights reserved
               </p>
-              <div className="flex items-center gap-4 text-zinc-400 text-[11px]" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <div className="flex items-center gap-4 text-zinc-400 text-[11px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 <span>Teknik Jaringan Komputer dan Telekomunikasi</span>
               </div>
             </div>
