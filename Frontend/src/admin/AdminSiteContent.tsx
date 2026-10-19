@@ -178,14 +178,14 @@ const DEFAULT_SITE_CONTENT: SiteContentData = {
   // Kontak
   contactTitle: "Hubungi TJKT",
   contactSubtitle: "Pusat Informasi Pendaftaran & Kerjasama Industri",
-  contactAddress: "Jl. Pati - Kudus KM 4, Pati, Jawa Tengah 59163",
-  contactPhone: "+62 812-3456-7890",
-  contactEmail: "tjkt@smkthpati.sch.id",
+  contactAddress: "Jln. Raya Pati Trangkil KM.4, Kabupaten Pati, Jawa Tengah 59119",
+  contactPhone: "+62 895-1068-8091",
+  contactEmail: "smkthpt@yahoo.com",
   contactMapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.0!2d110.98!3d-6.75!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwNDUnMDAuMCJTIDExMMKwNTknMDAuMCJF!5e0!3m2!1sid!2sid!4v1600000000000!5m2!1sid!2sid",
   socials: [
-    { platform: "Instagram", url: "https://instagram.com/tjkt_smkthpati", enabled: true },
+    { platform: "Instagram", url: "https://www.instagram.com/media.tjkt", enabled: true },
     { platform: "YouTube", url: "https://youtube.com/@tjkt_smkthpati", enabled: true },
-    { platform: "TikTok", url: "https://tiktok.com/@tjkt_smkthpati", enabled: true },
+    { platform: "TikTok", url: "https://www.tiktok.com/@media.tjkt", enabled: true },
   ],
   sectionTitles: {
     about: { title: "Tentang Jurusan TJKT", subtitle: "Mencetak Talenta Digital Handal Berstandar Industri" },
