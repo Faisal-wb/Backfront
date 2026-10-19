@@ -144,7 +144,7 @@ export const BinaryQuizGame: React.FC = () => {
       {/* Daily streak bump notification */}
       {showStreakBump && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-500 text-white font-bold shadow-xl text-sm animate-bounce pointer-events-none">
-          <Flame size={18} /> Streak Harian +1! {bumpValue} hari berturut-turut! 🔥
+          <Flame size={18} /> Streak Harian +1! {bumpValue} hari berturut-turut!
         </div>
       )}
 
@@ -269,7 +269,7 @@ export const BinaryQuizGame: React.FC = () => {
               <div className="text-left">
                 <div className="font-bold text-sm">
                   {isCorrect
-                    ? `Jawaban Benar! +${difficulty === "easy" ? 10 : 25} poin 🎉`
+                    ? `Jawaban Benar! +${difficulty === "easy" ? 10 : 25} poin`
                     : "Kurang Tepat!"}
                 </div>
                 <div className="text-xs font-mono text-slate-600 dark:text-zinc-400">
@@ -299,7 +299,7 @@ export const BinaryQuizGame: React.FC = () => {
               {breakdown.formulaString}
             </div>
             <div className="text-[11px] text-slate-500 dark:text-zinc-400">
-              💡 Ingat bobot 8 bit dari kiri ke kanan: <span className="font-bold text-slate-700 dark:text-zinc-200">128, 64, 32, 16, 8, 4, 2, 1</span>
+              Catatan: Ingat bobot 8 bit dari kiri ke kanan: <span className="font-bold text-slate-700 dark:text-zinc-200">128, 64, 32, 16, 8, 4, 2, 1</span>
             </div>
           </div>
         )}

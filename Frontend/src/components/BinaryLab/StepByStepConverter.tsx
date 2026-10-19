@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { 
-  Calculator, BookOpen, Sparkles, Layers, ListOrdered
+  Calculator, BookOpen
 } from "lucide-react";
 import { 
   generateBinaryToDecimalBreakdown,
@@ -37,7 +37,7 @@ export const StepByStepConverter: React.FC = () => {
             activeTab === "binToDec" ? "bg-red-600 text-white shadow-sm" : "text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white"
           }`}
         >
-          <Calculator size={14} /> Biner ➔ Desimal
+          <Calculator size={14} /> Biner → Desimal
         </button>
         <button
           onClick={() => setActiveTab("decToBin")}
@@ -45,7 +45,7 @@ export const StepByStepConverter: React.FC = () => {
             activeTab === "decToBin" ? "bg-red-600 text-white shadow-sm" : "text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-white"
           }`}
         >
-          <BookOpen size={14} /> Desimal ➔ Biner
+          <BookOpen size={14} /> Desimal → Biner
         </button>
       </div>
 
@@ -83,7 +83,7 @@ export const StepByStepConverter: React.FC = () => {
           {/* Breakdown Table */}
           <div className="p-5 rounded-2xl bg-white dark:bg-[#1a1a1c] border border-slate-200 dark:border-white/10 shadow-sm transition-colors">
             <h4 className="text-sm font-bold text-slate-700 dark:text-zinc-200 flex items-center gap-2 mb-4">
-              <ListOrdered size={16} className="text-red-600 dark:text-red-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
               Langkah Perhitungan (Bobot Pangkat 2):
             </h4>
             <div className="overflow-x-auto">
@@ -168,7 +168,7 @@ export const StepByStepConverter: React.FC = () => {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
                 decMethod === "subtraction" ? "bg-red-600 text-white border-red-600 shadow-sm" : "bg-white dark:bg-[#1a1a1c] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/10 hover:border-red-300"
               }`}
-            >⭐ Pengurangan Bobot (TJKT)</button>
+            >Pengurangan Bobot (TJKT)</button>
             <button onClick={() => setDecMethod("division")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
                 decMethod === "division" ? "bg-red-600 text-white border-red-600 shadow-sm" : "bg-white dark:bg-[#1a1a1c] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/10 hover:border-red-300"
@@ -181,7 +181,7 @@ export const StepByStepConverter: React.FC = () => {
             <div className="p-5 rounded-2xl bg-white dark:bg-[#1a1a1c] border border-slate-200 dark:border-white/10 shadow-sm transition-colors">
               <div className="mb-4">
                 <h4 className="text-sm font-bold text-slate-700 dark:text-zinc-200 flex items-center gap-2">
-                  <Sparkles size={15} className="text-red-600 dark:text-red-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
                   Metode Pengurangan Bobot (Cara Cepat Teknisi Jaringan)
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
@@ -229,7 +229,7 @@ export const StepByStepConverter: React.FC = () => {
             <div className="p-5 rounded-2xl bg-white dark:bg-[#1a1a1c] border border-slate-200 dark:border-white/10 shadow-sm transition-colors">
               <div className="mb-4">
                 <h4 className="text-sm font-bold text-slate-700 dark:text-zinc-200 flex items-center gap-2">
-                  <Layers size={15} className="text-red-600 dark:text-red-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
                   Metode Pembagian 2 Berulang (Modulo)
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">

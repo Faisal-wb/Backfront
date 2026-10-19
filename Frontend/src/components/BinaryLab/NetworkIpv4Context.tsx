@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Network, Globe, Sliders } from "lucide-react";
 import { decimalToBits } from "./binaryLabUtils";
 
 export const NetworkIpv4Context: React.FC = () => {
@@ -29,9 +28,7 @@ export const NetworkIpv4Context: React.FC = () => {
 
       {/* Info Banner */}
       <div className="p-4 rounded-xl bg-white dark:bg-[#1a1a1c] border border-slate-200 dark:border-white/10 shadow-sm flex items-start gap-3 transition-colors">
-        <div className="w-9 h-9 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0 mt-0.5">
-          <Network size={17} />
-        </div>
+        <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0 mt-1.5" />
         <div>
           <h3 className="text-sm font-bold text-slate-800 dark:text-white">Mengapa Siswa TJKT Wajib Paham Biner?</h3>
           <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
@@ -47,7 +44,7 @@ export const NetworkIpv4Context: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
           <div>
             <h4 className="text-sm font-bold text-slate-700 dark:text-zinc-200 flex items-center gap-2">
-              <Globe size={15} className="text-red-600 dark:text-red-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
               Simulator 4 Oktet IPv4 Address
             </h4>
             <p className="text-xs text-slate-500 dark:text-zinc-400">Ketik angka desimal, lihat representasi 32-bit binernya secara langsung:</p>
@@ -111,7 +108,7 @@ export const NetworkIpv4Context: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
           <div>
             <h4 className="text-sm font-bold text-slate-700 dark:text-zinc-200 flex items-center gap-2">
-              <Sliders size={15} className="text-red-600 dark:text-red-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
               Visualisasi Subnet Mask CIDR (/8 s/d /30)
             </h4>
             <p className="text-xs text-slate-500 dark:text-zinc-400">

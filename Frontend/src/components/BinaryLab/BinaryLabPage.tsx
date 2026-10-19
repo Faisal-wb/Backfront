@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   ArrowLeft, Cpu, Calculator, Network, 
-  Trophy, Zap, Sun, Moon
+  Trophy, Sun, Moon
 } from "lucide-react";
 import { InteractiveBitBoxes } from "./InteractiveBitBoxes";
 import { StepByStepConverter } from "./StepByStepConverter";
@@ -111,13 +111,6 @@ export const BinaryLabPage: React.FC<BinaryLabPageProps> = ({ onBackToSite }) =>
                 <Moon size={15} className="text-slate-600" />
               )}
             </button>
-
-            {/* Live Badge */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="hidden sm:inline">LIVE LAB</span>
-              <Zap size={12} className="sm:hidden" />
-            </div>
           </div>
         </div>
       </header>

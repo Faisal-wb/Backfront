@@ -1922,18 +1922,18 @@ export default function App() {
                   <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
                 </a>
 
-                <div className="mt-12 flex flex-wrap justify-center gap-8 text-red-300/30 text-sm">
+                <div className="mt-12 flex flex-wrap justify-center gap-8 text-white -300/30 text-sm">
                   <div className="flex items-center gap-2">
                     <MapPin size={13} />
                     <span>{siteContent.contactAddress || "Pati, Jawa Tengah"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone size={13} />
-                    <span>{siteContent.contactPhone || "(0295) 385XXX"}</span>
+                    <span>{siteContent.contactPhone || "(0295) 382470"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail size={13} />
-                    <span>{siteContent.contactEmail || "tjkt@smkth.sch.id"}</span>
+                    <span>{siteContent.contactEmail || "smkthpt@yahoo.com"}</span>
                   </div>
                 </div>
               </div>
@@ -2013,11 +2013,11 @@ export default function App() {
                   </li>
                   <li className="flex items-center gap-2.5 text-zinc-400 text-sm">
                     <Phone size={14} className="text-red-500 flex-shrink-0" />
-                    (0295) 385XXX
+                    (0295) 382470
                   </li>
                   <li className="flex items-center gap-2.5 text-zinc-400 text-sm">
                     <Mail size={14} className="text-red-500 flex-shrink-0" />
-                    tjkt@smkth.sch.id
+                    smkthpt@yahoo.com
                   </li>
                 </ul>
               </div>
