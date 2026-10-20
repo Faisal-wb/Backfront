@@ -47,21 +47,7 @@ export const BinaryLabPage: React.FC<BinaryLabPageProps> = ({ onBackToSite }) =>
   };
 
   const handleBack = () => {
-    if (window.opener && !window.opener.closed) {
-      try {
-        window.close();
-        return;
-      } catch (e) {
-        // Fallback jika browser memblokir window.close()
-      }
-    }
-    if (onBackToSite) {
-      onBackToSite();
-    } else {
-      window.location.hash = "";
-      window.history.pushState(null, "", "/");
-      window.location.reload();
-    }
+    window.location.href = "/";
   };
 
   return (
