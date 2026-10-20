@@ -1019,11 +1019,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    console.log("DEPLOY BERHASIL YEYYYY")
-    if (isAdminView) return;
+    // Jangan jalankan Lenis di Admin view atau di BitLab simulator view
+    if (isAdminView || isBinaryLabView) return;
 
     const lenis = new Lenis({
-      duration: 1.4,
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       wheelMultiplier: 1.1,
@@ -1037,11 +1037,25 @@ export default function App() {
     }
     rafId = requestAnimationFrame(raf);
 
+    // Sync scroll limit dynamically saat ukuran DOM berubah (gambar load, API render, dsb.)
+    const resizeObserver = new ResizeObserver(() => {
+      lenis.resize();
+    });
+    if (document.body) {
+      resizeObserver.observe(document.body);
+    }
+
+    const timer = setTimeout(() => {
+      lenis.resize();
+    }, 400);
+
     return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
-  }, [isAdminView]);
+  }, [isAdminView, isBinaryLabView]);
 
   useEffect(() => {
     let ticking = false;
@@ -1102,6 +1116,7 @@ export default function App() {
         onBackToSite={() => {
           window.history.pushState(null, "", "/");
           setIsBinaryLabView(false);
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
         }}
       />
     );
