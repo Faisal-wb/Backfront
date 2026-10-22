@@ -15,6 +15,7 @@ class AdminGalleryController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:15360', // max 15MB
             'url' => 'nullable|string',
             'alt' => 'nullable|string|max:255',
+            'category' => 'nullable|string|in:programming,networking,all',
             'tall' => 'nullable|boolean',
             'order' => 'nullable|integer',
         ]);
@@ -33,6 +34,7 @@ class AdminGalleryController extends Controller
         $gallery = GalleryItem::create([
             'url' => $url,
             'alt' => $request->alt ?? 'Foto Galeri TJKT',
+            'category' => $request->category ?? 'all',
             'tall' => $request->boolean('tall', false),
             'order' => $request->order ?? 0,
         ]);
@@ -52,6 +54,7 @@ class AdminGalleryController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:15360',
             'url' => 'nullable|string',
             'alt' => 'nullable|string|max:255',
+            'category' => 'nullable|string|in:programming,networking,all',
             'tall' => 'nullable|boolean',
             'order' => 'nullable|integer',
         ]);
@@ -60,15 +63,15 @@ class AdminGalleryController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old file if it exists and is local
-            if (str_starts_with($url, '/storage/')) {
-                $oldPath = str_replace('/storage/', '', $url);
+            if ($url && str_contains($url, '/storage/gallery/')) {
+                $oldPath = 'gallery/' . basename($url);
                 Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('image')->store('gallery', 'public');
             $url = '/api/storage/' . $path;
         } elseif ($request->url && $request->url !== $gallery->url) {
-            if (str_starts_with($gallery->url, '/storage/')) {
-                $oldPath = str_replace('/storage/', '', $gallery->url);
+            if ($gallery->url && str_contains($gallery->url, '/storage/gallery/')) {
+                $oldPath = 'gallery/' . basename($gallery->url);
                 Storage::disk('public')->delete($oldPath);
             }
             $url = $request->url;
@@ -77,6 +80,7 @@ class AdminGalleryController extends Controller
         $gallery->update([
             'url' => $url,
             'alt' => $request->alt ?? $gallery->alt,
+            'category' => $request->category ?? $gallery->category ?? 'all',
             'tall' => $request->has('tall') ? $request->boolean('tall') : $gallery->tall,
             'order' => $request->order ?? $gallery->order,
         ]);
@@ -92,8 +96,8 @@ class AdminGalleryController extends Controller
     {
         $gallery = GalleryItem::findOrFail($id);
 
-        if (str_starts_with($gallery->url, '/storage/')) {
-            $oldPath = str_replace('/storage/', '', $gallery->url);
+        if ($gallery->url && str_contains($gallery->url, '/storage/gallery/')) {
+            $oldPath = 'gallery/' . basename($gallery->url);
             Storage::disk('public')->delete($oldPath);
         }
 

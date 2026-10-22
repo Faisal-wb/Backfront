@@ -1,6 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Award, Plus, Trash2, X, Check, Search, Pencil, Database } from "lucide-react";
-import { adminAchievementsApi } from "../services/api";
+import { Award, Plus, Trash2, X, Check, Search, Pencil, Database, Upload, Image as ImageIcon } from "lucide-react";
+import { adminAchievementsApi, resolveImageUrl } from "../services/api";
+
+function compressImage(file: File, maxPx = 1400, quality = 0.75): Promise<File> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * ratio));
+        canvas.height = Math.max(1, Math.round(img.height * ratio));
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const compressedFile = new File(
+                [blob],
+                file.name.replace(/\.[^/.]+$/, "") + ".webp",
+                { type: "image/webp" }
+              );
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          }, "image/webp", quality);
+        } else {
+          resolve(file);
+        }
+      };
+      img.onerror = () => resolve(file);
+      img.src = dataUrl;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
 
 export interface AchievementData {
   id?: number;
@@ -8,6 +46,8 @@ export interface AchievementData {
   event: string;
   result: string;
   tier: "gold" | "silver" | "bronze";
+  image?: string;
+  icon?: string;
 }
 
 interface AdminAchievementsProps {
@@ -16,7 +56,7 @@ interface AdminAchievementsProps {
   theme?: "light" | "dark";
 }
 
-const EMPTY_FORM: AchievementData = { year: "2026", event: "", result: "", tier: "gold" };
+const EMPTY_FORM: AchievementData = { year: "2026", event: "", result: "", tier: "gold", image: "" };
 
 export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievements: propAchievements, onUpdateAchievements, theme = "light" }) => {
   const isDark = theme === "dark";
@@ -24,13 +64,36 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
   const [achievements, setAchievements] = useState<AchievementData[]>(propAchievements || []);
   const [modalMode, setModalMode] = useState<null | "add" | number>(null);
   const [formData, setFormData] = useState<AchievementData>(EMPTY_FORM);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AchievementData | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    if (Array.isArray(propAchievements) && propAchievements.length > 0) {
+      setAchievements(propAchievements);
+    }
+  }, [propAchievements]);
 
   useEffect(() => {
     onUpdateAchievements(achievements);
   }, [achievements, onUpdateAchievements]);
+
+  useEffect(() => {
+    if (selectedFile) {
+      const objUrl = URL.createObjectURL(selectedFile);
+      setPreviewUrl(objUrl);
+      return () => URL.revokeObjectURL(objUrl);
+    }
+    if (formData.image) {
+      setPreviewUrl(resolveImageUrl(formData.image));
+    } else {
+      setPreviewUrl("");
+    }
+  }, [selectedFile, formData.image]);
 
   const filteredAchievements = achievements.filter(
     (a) =>
@@ -41,12 +104,17 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
 
   const openAdd = () => {
     setFormData(EMPTY_FORM);
+    setSelectedFile(null);
+    setPreviewUrl("");
     setSaveError(null);
     setModalMode("add");
   };
 
-  const openEdit = (idx: number) => {
-    setFormData({ ...achievements[idx] });
+  const openEdit = (item: AchievementData, idx: number) => {
+    if (!item) return;
+    setFormData({ ...item });
+    setSelectedFile(null);
+    setPreviewUrl(resolveImageUrl(item.image));
     setSaveError(null);
     setModalMode(idx);
   };
@@ -54,21 +122,32 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
   const closeModal = () => {
     setModalMode(null);
     setFormData(EMPTY_FORM);
+    setSelectedFile(null);
+    setPreviewUrl("");
     setSaveError(null);
   };
 
-  const handleDelete = async (index: number) => {
-    const item = achievements[index];
-    if (window.confirm(`Yakin menghapus prestasi "${item.event}"?`)) {
-      if (item.id) {
-        try {
-          await adminAchievementsApi('DELETE', item.id, {});
-        } catch (e) {
-          console.error("Failed to delete from server", e);
-        }
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const target = deleteTarget;
+    setIsDeleting(true);
+
+    if (target.id) {
+      try {
+        await adminAchievementsApi('DELETE', target.id);
+      } catch (e) {
+        console.error("Failed to delete from server", e);
       }
-      setAchievements(achievements.filter((_, i) => i !== index));
     }
+
+    const next = achievements.filter((a) => {
+      if (target.id && a.id) return a.id !== target.id;
+      return a !== target;
+    });
+
+    setAchievements(next);
+    setIsDeleting(false);
+    setDeleteTarget(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,13 +161,21 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
       const isEdit = typeof modalMode === "number";
       const id = isEdit ? achievements[modalMode as number].id! : null;
       
-      const payload = {
-        event: formData.event,
-        result: formData.result,
-        tier: formData.tier,
-        year: formData.year,
-        order: achievements.length
-      };
+      const payload = new FormData();
+      payload.append('event', formData.event);
+      payload.append('result', formData.result);
+      payload.append('tier', formData.tier);
+      payload.append('year', formData.year);
+      payload.append('order', String(achievements.length));
+
+      if (selectedFile) {
+        payload.append('image', selectedFile);
+      } else if (formData.image) {
+        payload.append('image_url', formData.image);
+      } else {
+        payload.append('remove_image', '1');
+        payload.append('image_url', '');
+      }
 
       const res = await adminAchievementsApi('POST', id, payload);
       
@@ -130,11 +217,11 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
         <div>
           <h2 className={`text-xl font-black flex items-center gap-2 ${isDark ? "text-white" : "text-slate-900"}`}>
             <Award className="text-amber-500" size={22} />
-            Kelola Prestasi &amp; Kejuaraan TJKT
+            Kelola Prestasi &amp; Rekam Jejak Kebanggaan
           </h2>
           <p className={`text-xs mt-1 flex items-center gap-2 ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
             <Database size={11} className="text-amber-500" />
-            Tersimpan di Database MySQL &mdash; Sinkronisasi Otomatis
+            Tersimpan di Database MySQL &mdash; Dilengkapi Foto Hasil Juara/Piala
           </p>
         </div>
         <button
@@ -175,6 +262,7 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
               isDark ? "bg-zinc-900/90 text-zinc-400 border-zinc-800" : "bg-slate-50 text-slate-600 border-slate-200"
             }`}>
               <tr>
+                <th className="py-3.5 px-4">Foto</th>
                 <th className="py-3.5 px-4">Tahun</th>
                 <th className="py-3.5 px-4">Nama Lomba / Event</th>
                 <th className="py-3.5 px-4">Hasil / Gelar Juara</th>
@@ -184,13 +272,32 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
             </thead>
             <tbody className={`divide-y ${isDark ? "divide-zinc-800/80 text-zinc-300" : "divide-slate-100 text-slate-700"}`}>
               {filteredAchievements.length === 0 ? (
-                <tr><td colSpan={5} className={`py-10 text-center text-sm ${isDark ? "text-zinc-500" : "text-slate-400"}`}>
+                <tr><td colSpan={6} className={`py-10 text-center text-sm ${isDark ? "text-zinc-500" : "text-slate-400"}`}>
                   {searchQuery ? `Tidak ada prestasi dengan kata kunci "${searchQuery}"` : "Belum ada data prestasi."}
                 </td></tr>
               ) : filteredAchievements.map((item) => {
                 const idx = achievements.indexOf(item);
+                const displayImg = resolveImageUrl(item.image);
                 return (
                   <tr key={idx} className={isDark ? "hover:bg-zinc-800/40" : "hover:bg-slate-50/80"}>
+                    <td className="py-3 px-4">
+                      {displayImg ? (
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0 shadow-sm">
+                          <img
+                            src={displayImg}
+                            alt={item.event}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-slate-100/70 dark:bg-zinc-800/50 flex items-center justify-center shrink-0">
+                          <Award size={18} className="text-slate-400 dark:text-zinc-500" />
+                        </div>
+                      )}
+                    </td>
                     <td className={`py-3.5 px-4 font-bold ${isDark ? "text-white" : "text-slate-900"}`}>{item.year}</td>
                     <td className={`py-3.5 px-4 font-semibold ${isDark ? "text-zinc-200" : "text-slate-800"}`}>{item.event}</td>
                     <td className="py-3.5 px-4 text-emerald-500 font-bold">{item.result}</td>
@@ -208,7 +315,8 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                     <td className="py-3.5 px-4 text-right">
                       <div className="inline-flex items-center gap-1.5">
                         <button
-                          onClick={() => openEdit(idx)}
+                          type="button"
+                          onClick={() => openEdit(item, idx)}
                           className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                             isDark
                               ? "bg-blue-900/40 hover:bg-blue-800/60 text-blue-400"
@@ -219,7 +327,8 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                           <Pencil size={14} />
                         </button>
                         <button
-                          onClick={() => handleDelete(idx)}
+                          type="button"
+                          onClick={() => setDeleteTarget(item)}
                           className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                             isDark
                               ? "bg-rose-900/40 hover:bg-rose-800/60 text-rose-400"
@@ -241,7 +350,7 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm">
-          <div className={`w-full max-w-md border rounded-2xl p-6 shadow-2xl space-y-4 ${
+          <div className={`w-full max-w-md border rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto ${
             isDark ? "bg-[#18181b] border-zinc-800 text-white" : "bg-white border-slate-200 text-slate-900"
           }`}>
             <div className={`flex items-center justify-between border-b pb-4 ${isDark ? "border-zinc-800" : "border-slate-100"}`}>
@@ -270,6 +379,58 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* IMAGE UPLOAD & PREVIEW */}
+              <div>
+                <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? "text-zinc-300" : "text-slate-700"}`}>
+                  Foto Hasil Juara / Sertifikat / Piala (Kecil)
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                    {previewUrl ? (
+                      <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon size={22} className="text-slate-400 dark:text-zinc-600" />
+                    )}
+                  </div>
+                  <label className={`flex-1 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    isDark ? "bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700" : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
+                  }`}>
+                    <Upload size={14} />
+                    <span>{selectedFile ? `${selectedFile.name.substring(0, 15)}... ✓` : "Upload Foto Juara..."}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploading(true);
+                          const compressed = await compressImage(file, 1400, 0.75);
+                          setSelectedFile(compressed);
+                          setUploading(false);
+                        } else {
+                          setSelectedFile(null);
+                        }
+                      }}
+                    />
+                  </label>
+                  {(previewUrl || selectedFile) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setFormData({ ...formData, image: "" });
+                        setPreviewUrl("");
+                      }}
+                      className="p-2 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      title="Hapus Foto"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={`block text-xs font-bold uppercase mb-1 ${isDark ? "text-zinc-300" : "text-slate-700"}`}>Tahun</label>
@@ -359,6 +520,77 @@ export const AdminAchievements: React.FC<AdminAchievementsProps> = ({ achievemen
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL KONFIRMASI HAPUS PRESTASI */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fadein">
+          <div className={`w-full max-w-sm border rounded-2xl p-6 shadow-2xl space-y-4 ${
+            isDark ? "bg-[#18181b] border-zinc-800 text-white" : "bg-white border-slate-200 text-slate-900"
+          }`}>
+            <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/50 flex items-center justify-center shrink-0">
+                <Trash2 size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-base leading-snug">Hapus Data Prestasi?</h3>
+                <p className={`text-xs ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Tindakan ini tidak dapat dibatalkan</p>
+              </div>
+            </div>
+
+            {deleteTarget.image && (
+              <div className="h-32 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
+                <img
+                  src={resolveImageUrl(deleteTarget.image)}
+                  alt={deleteTarget.event}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              </div>
+            )}
+
+            <div className={`p-3 rounded-xl border text-xs space-y-1 ${
+              isDark ? "bg-zinc-900/60 border-zinc-800 text-zinc-300" : "bg-slate-50 border-slate-200 text-slate-700"
+            }`}>
+              <p className="font-bold text-slate-900 dark:text-white truncate">{deleteTarget.event}</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-semibold">{deleteTarget.result} &bull; {deleteTarget.year}</p>
+            </div>
+
+            <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
+              Data prestasi ini akan dihapus permanen dari database MySQL dan website publik TJKT.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                  isDark ? "border-zinc-700 hover:bg-zinc-800 text-zinc-300" : "border-slate-200 hover:bg-slate-100 text-slate-700"
+                }`}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <span>Menghapus...</span>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>Ya, Hapus Prestasi</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

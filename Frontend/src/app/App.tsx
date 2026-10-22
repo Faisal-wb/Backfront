@@ -6,9 +6,10 @@ import {
   MapPin, Phone, Mail, Instagram, Youtube, Zap,
   Globe, ArrowRight, Menu, X, GraduationCap,
   Layers, Trophy, Shield, Code, Sun, Moon,
-  ChevronLeft, ChevronRight, Terminal
+  ChevronLeft, ChevronRight, Terminal, Briefcase,
+  FolderGit2, Sparkles, ExternalLink, ArrowDown, Eye
 } from "lucide-react";
-import { fetchPublicContent, adminLogout, API_BASE_URL } from "../services/api";
+import { fetchPublicContent, adminLogout, API_BASE_URL, resolveImageUrl } from "../services/api";
 import { AdminLogin } from "../admin/AdminLogin";
 import { AdminLayout } from "../admin/AdminLayout";
 import { L3Preloader } from "../components/L3Preloader";
@@ -31,17 +32,6 @@ import imgTHP09787 from "../assets/TKJ/THP09787.webp";
 import imgTHP09790 from "../assets/TKJ/THP09790.webp";
 
 // ─── DATA ─────────────────────────────────────────────────────────────────
-
-function resolveImageUrl(path: string | undefined, defaultImg: string) {
-  if (!path) return defaultImg;
-  if (path.startsWith('http') || path.startsWith('data:')) return path;
-  if (path.startsWith('/api/')) {
-    // API_BASE_URL is 'https://lt3tjkt.smkthpati.sch.id/api'
-    const domain = API_BASE_URL.replace('/api', '');
-    return `${domain}${path}`;
-  }
-  return path;
-}
 
 const NAV_LINKS = [
   { label: "Beranda", href: "#home" },
@@ -82,14 +72,14 @@ const KEUNGGULAN = [
 ];
 
 const PRESTASI = [
-  { year: "2025", event: "UI/UX Design", result: "Juara 2 Genetic", tier: "silver" },
-  { year: "2024", event: "UI/UX Design", result: "Juara 3 Genetic", tier: "bronze" },
-  { year: "2019", event: "LKS Web Technologies", result: "Juara 1 Nasional", tier: "gold" },
-  { year: "2025", event: "LKS Cyber Security", result: "Juara 2 Provinsi", tier: "silver" },
-  { year: "2026", event: "Artificial Intelligence", result: "Juara 2 Provinsi", tier: "silver" },
-  { year: "2026", event: "LKS Web Technologies", result: "Juara 1 Provinsi", tier: "gold" },
-  { year: "2025", event: "IT Software Solution", result: "Juara 1 Kabupaten", tier: "gold" },
-  { year: "2026", event: "Web Design Competition", result: "Juara 1 Kabupaten", tier: "gold" },
+  { year: "2025", event: "UI/UX Design", result: "Juara 2 Genetic", tier: "silver", image: imgTHP09750 },
+  { year: "2024", event: "UI/UX Design", result: "Juara 3 Genetic", tier: "bronze", image: imgTHP09765 },
+  { year: "2019", event: "LKS Web Technologies", result: "Juara 1 Nasional", tier: "gold", image: imgTHP09712 },
+  { year: "2025", event: "LKS Cyber Security", result: "Juara 2 Provinsi", tier: "silver", image: imgTHP09774 },
+  { year: "2026", event: "Artificial Intelligence", result: "Juara 2 Provinsi", tier: "silver", image: imgTHP09732 },
+  { year: "2026", event: "LKS Web Technologies", result: "Juara 1 Provinsi", tier: "gold", image: imgTHP09750 },
+  { year: "2025", event: "IT Software Solution", result: "Juara 1 Kabupaten", tier: "gold", image: imgTHP09712 },
+  { year: "2026", event: "Web Design Competition", result: "Juara 1 Kabupaten", tier: "gold", image: imgTHP09774 },
 ];
 
 const FACULTY = [
@@ -116,14 +106,14 @@ const NETWORKING_TAGS = [
 ];
 
 const GALLERY = [
-  { url: imgTHP09787, alt: "Praktik Perbaikan Server" },
-  { url: imgTHP09750, alt: "Praktik Membuat Web" },
-  { url: imgTHP09712, alt: "Praktik Rakit PC dan Install OS" },
-  { url: imgTHP09765, alt: "Workshop coding siswa TJKT" },
-  { url: imgTHP09774, alt: "Lab jaringan Cisco & MikroTik" },
-  { url: imgTHP09787, alt: "Praktik splicing fiber optik" },
-  { url: imgTHP09790, alt: "Server room & infrastruktur TJKT" },
-  { url: imgTHP09732, alt: "Lab komputer high-spec TJKT" },
+  { url: imgTHP09787, alt: "Praktik Perbaikan & Konfigurasi Server", category: "networking" },
+  { url: imgTHP09750, alt: "Praktik Pemrograman Web & Front-End", category: "programming" },
+  { url: imgTHP09712, alt: "Praktik Coding & Rekayasa Perangkat Lunak", category: "programming" },
+  { url: imgTHP09765, alt: "Workshop Mobile App & Game Development", category: "programming" },
+  { url: imgTHP09774, alt: "Lab Jaringan Cisco & MikroTik Router", category: "networking" },
+  { url: imgTHP09787, alt: "Praktik Splicing Fiber Optik & OTDR", category: "networking" },
+  { url: imgTHP09790, alt: "Server Room & Infrastruktur Data Center TJKT", category: "networking" },
+  { url: imgTHP09732, alt: "Lab Komputer Pemrograman High-Spec", category: "programming" },
 ];
 
 const HERO_SLIDES = [
@@ -335,27 +325,42 @@ function SpotlightCard({ children, className = "" }: { children: React.ReactNode
   );
 }
 
-// ─── BITLAB CALL TO ACTION ─────────────────────────────────────────────────
+// ─── BITLAB PROMINENT CALL TO ACTION ───────────────────────────────────────
 
-function BitLabSimpleCta() {
+function BitLabHeroCta() {
   return (
-    <div className="mt-5 p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
-        <p className="text-sm text-slate-700 dark:text-zinc-300">
-          Pelajari logika biner dan perhitungan subnetting jaringan secara interaktif di <span className="font-semibold text-slate-900 dark:text-white">BitLab</span>.
-        </p>
-      </div>
+    <div className="mt-8 rounded-3xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-white/[0.08] hover:border-red-500/40 dark:hover:border-red-500/30 transition-all duration-300 p-7 sm:p-9 shadow-md hover:shadow-xl dark:shadow-none relative overflow-hidden group">
+      {/* Decorative subtle glows */}
+      <div className="absolute -top-24 -right-24 w-80 h-80 bg-red-500/5 dark:bg-red-600/15 rounded-full blur-[90px] pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-red-500/5 dark:bg-red-900/20 rounded-full blur-[90px] pointer-events-none" />
 
-      <a
-        href="/lab-biner"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-semibold tracking-wide transition-colors shrink-0"
-      >
-        <span>Buka BitLab</span>
-        <ArrowRight size={14} />
-      </a>
+      <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="max-w-2xl">
+          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight mb-2.5">
+            BitLab TJKT &mdash;{" "}
+            <span className="text-red-600 dark:text-red-500">
+              Interactive Binary Lab
+            </span>
+          </h3>
+
+          <p className="text-slate-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
+            Pelajari logika biner, gerbang logika digital, dan perhitungan subnetting jaringan IPv4 CIDR secara interaktif langsung di browsermu.
+          </p>
+        </div>
+
+        <div className="shrink-0 flex items-center gap-3">
+          <a
+            href="/lab-biner"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm tracking-wide shadow-md shadow-red-600/25 hover:shadow-red-600/40 hover:scale-[1.02] transition-all cursor-pointer"
+          >
+            <Terminal size={17} />
+            <span>Buka Simulator BitLab</span>
+            <ArrowRight size={16} />
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
@@ -406,14 +411,13 @@ function OverlakeFactsSection() {
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight">
               Keunggulan &amp; Standar Pembelajaran
             </h2>
-
           </div>
           <p className="text-slate-600 dark:text-zinc-400 text-sm max-w-md leading-relaxed">
             Kombinasi fasilitas modern, sertifikasi industri berstandar global, dan iklim pembelajaran vokasi yang melahirkan talenta digital masa depan.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {facts.map((f, i) => {
             const Icon = f.icon;
             return (
@@ -450,8 +454,8 @@ function OverlakeFactsSection() {
           })}
         </div>
 
-        {/* ── BITLAB SIMPLE CTA ── */}
-        <BitLabSimpleCta />
+        {/* ── BITLAB ENLARGED PROMINENT CTA ── */}
+        <BitLabHeroCta />
       </div>
     </section>
   );
@@ -636,16 +640,59 @@ function FluidCanvasCursor() {
 
 // â”€â”€â”€ GALLERY SECTION (Hacienda style) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] }) {
-
+function GallerySection({
+  gallery,
+  categoryFilter,
+  onSelectCategory,
+}: {
+  gallery: { id?: number; url: string; alt?: string; category?: "programming" | "networking" | "all" }[];
+  categoryFilter: "all" | "programming" | "networking";
+  onSelectCategory: (cat: "all" | "programming" | "networking") => void;
+}) {
   const [activeIdx, setActiveIdx] = React.useState(0);
   const [prevIdx, setPrevIdx] = React.useState<number | null>(null);
   const [animating, setAnimating] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
-  const thumbStripRef = React.useRef<HTMLDivElement>(null);
 
   const [touchStart, setTouchStart] = React.useState<number | null>(null);
   const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
+
+  // Filter items based on active category
+  const items = React.useMemo(() => {
+    if (!gallery || gallery.length === 0) return [];
+    if (categoryFilter === "all") return gallery;
+    const filtered = gallery.filter(
+      (item) => (item.category || "all") === categoryFilter || item.category === "all"
+    );
+    return filtered.length > 0 ? filtered : gallery;
+  }, [gallery, categoryFilter]);
+
+  React.useEffect(() => {
+    if (activeIdx >= items.length) {
+      setActiveIdx(0);
+    }
+  }, [items.length, activeIdx]);
+
+  const active = items[activeIdx] || items[0];
+
+  const switchTo = React.useCallback(
+    (idx: number) => {
+      if (idx === activeIdx || animating || items.length === 0) return;
+      setPrevIdx(activeIdx);
+      setAnimating(true);
+      setActiveIdx(idx);
+      setTimeout(() => {
+        setPrevIdx(null);
+        setAnimating(false);
+      }, 600);
+    },
+    [activeIdx, animating, items.length]
+  );
+
+  const activeIdxRef = React.useRef(activeIdx);
+  activeIdxRef.current = activeIdx;
+  const switchToRef = React.useRef(switchTo);
+  switchToRef.current = switchTo;
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -657,7 +704,7 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
   };
 
   const handleTouchEnd = () => {
-    if (touchStart === null || touchEnd === null) return;
+    if (touchStart === null || touchEnd === null || items.length === 0) return;
     const distance = touchStart - touchEnd;
     const minSwipeDistance = 50;
     if (distance > minSwipeDistance) {
@@ -667,31 +714,9 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
     }
   };
 
-  // Mouse drag - use refs to avoid stale closure
+  // Mouse drag
   const mouseStartRef = React.useRef<number | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
-
-  const items = gallery.length > 0 ? gallery : [];
-  const active = items[activeIdx];
-
-  const switchTo = React.useCallback(
-    (idx: number) => {
-      if (idx === activeIdx || animating) return;
-      setPrevIdx(activeIdx);
-      setAnimating(true);
-      setActiveIdx(idx);
-      setTimeout(() => {
-        setPrevIdx(null);
-        setAnimating(false);
-      }, 600);
-    },
-    [activeIdx, animating]
-  );
-
-  const activeIdxRef = React.useRef(activeIdx);
-  activeIdxRef.current = activeIdx;
-  const switchToRef = React.useRef(switchTo);
-  switchToRef.current = switchTo;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     mouseStartRef.current = e.clientX;
@@ -705,7 +730,7 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
-    if (mouseStartRef.current === null) return;
+    if (mouseStartRef.current === null || items.length === 0) return;
     const distance = mouseStartRef.current - e.clientX;
     const minDragDistance = 50;
     if (distance > minDragDistance) {
@@ -717,34 +742,17 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
     setIsDragging(false);
   };
 
-  // Autoplay interval every 4 seconds (pauses on hover)
+  // Autoplay interval every 4.5 seconds (pauses on hover)
   React.useEffect(() => {
     if (items.length <= 1 || isHovered) return;
     const interval = setInterval(() => {
       const nextIdx = (activeIdxRef.current + 1) % items.length;
       switchToRef.current(nextIdx);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [items.length, isHovered]);
 
-  // Scroll ONLY the thumbnail strip container div (without jumping/scrolling the main window)
-  React.useEffect(() => {
-    const container = thumbStripRef.current;
-    if (!container) return;
-    const activeBtn = container.children[activeIdx] as HTMLElement;
-    if (activeBtn) {
-      const btnTop = activeBtn.offsetTop;
-      const btnHeight = activeBtn.offsetHeight;
-      const containerHeight = container.clientHeight;
-      container.scrollTo({
-        top: btnTop - containerHeight / 2 + btnHeight / 2,
-        behavior: "smooth",
-      });
-    }
-  }, [activeIdx]);
-
-
-  if (items.length === 0) return null;
+  if (!items || items.length === 0 || !active) return null;
 
   return (
     <section
@@ -753,20 +761,57 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-
       {/* Section header overlay */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-start justify-between px-6 sm:px-10 pt-8 pb-4 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-20 flex flex-col md:flex-row items-start md:items-center justify-between px-6 sm:px-10 pt-8 pb-4 gap-4 pointer-events-none">
         <div className="flex items-center gap-3">
           <span className="text-xs font-black text-white/40 tracking-[0.2em]">05</span>
           <div className="h-px w-8 bg-white/20" />
-          <span className="text-xs tracking-[0.2em] uppercase text-white/40 font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>GALERI KEGIATAN</span>
+          <span className="text-xs tracking-[0.2em] uppercase text-white/70 font-bold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            GALERI KEGIATAN &amp; FASILITAS
+          </span>
         </div>
-        <p className="text-white/30 text-xs max-w-[200px] text-right leading-relaxed hidden md:block" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          Momen &amp; Aktivitas TJKT
-        </p>
+
+        {/* Category Tabs Filter */}
+        <div className="flex flex-wrap items-center gap-2 pointer-events-auto bg-black/60 backdrop-blur-md p-1.5 rounded-2xl md:rounded-full border border-white/10 shadow-xl">
+          <button
+            type="button"
+            onClick={() => onSelectCategory("all")}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              categoryFilter === "all"
+                ? "bg-white text-black shadow-md font-black"
+                : "text-zinc-300 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            Semua ({gallery.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelectCategory("programming")}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              categoryFilter === "programming"
+                ? "bg-red-600 text-white shadow-md shadow-red-600/40 font-black"
+                : "text-zinc-300 hover:text-red-400 hover:bg-white/10"
+            }`}
+          >
+            <Monitor size={13} />
+            <span>Programming ({gallery.filter((g) => g.category === "programming").length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelectCategory("networking")}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              categoryFilter === "networking"
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/40 font-black"
+                : "text-zinc-300 hover:text-emerald-400 hover:bg-white/10"
+            }`}
+          >
+            <Wifi size={13} />
+            <span>Networking ({gallery.filter((g) => g.category === "networking").length})</span>
+          </button>
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row h-[85vh] min-h-[480px] max-h-[820px]">
+      <div className="flex flex-col md:flex-row h-[85vh] min-h-[500px] max-h-[820px]">
         {/* ── LEFT: Big Main Image ── */}
         <div
           className="relative flex-1 overflow-hidden"
@@ -774,7 +819,7 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onMouseLeave={() => setMouseStart(null)}
+          onMouseLeave={() => { mouseStartRef.current = null; setIsDragging(false); }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -783,7 +828,7 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
           {prevIdx !== null && items[prevIdx] && (
             <img
               key={`prev-${prevIdx}`}
-              src={items[prevIdx].url}
+              src={resolveImageUrl(items[prevIdx].url)}
               alt=""
               className="absolute inset-0 w-full h-full object-cover transform-gpu"
               style={{
@@ -796,10 +841,11 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
               }}
             />
           )}
+
           {/* Active image */}
           <img
             key={`active-${activeIdx}`}
-            src={active.url}
+            src={resolveImageUrl(active.url)}
             alt={active.alt || "Galeri TJKT"}
             className="absolute inset-0 w-full h-full object-cover transform-gpu"
             style={{
@@ -812,14 +858,52 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
             }}
           />
 
-
           {/* Dark gradient overlay for text legibility */}
-          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/10 to-black/30 pointer-events-none" />
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/15 to-black/40 pointer-events-none" />
+
+          {/* Prev / Next controls */}
+          <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 z-30 flex items-center justify-between pointer-events-none">
+            <button
+              type="button"
+              onClick={() => switchTo((activeIdx - 1 + items.length) % items.length)}
+              className="w-11 h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 text-white flex items-center justify-center pointer-events-auto backdrop-blur-md transition-all hover:scale-110 cursor-pointer shadow-xl"
+              title="Foto Sebelumnya"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              type="button"
+              onClick={() => switchTo((activeIdx + 1) % items.length)}
+              className="w-11 h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 text-white flex items-center justify-center pointer-events-auto backdrop-blur-md transition-all hover:scale-110 cursor-pointer shadow-xl"
+              title="Foto Selanjutnya"
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
 
           {/* Title text at bottom-left */}
           <div className="absolute bottom-0 left-0 z-20 p-6 sm:p-10 md:p-12 max-w-3xl">
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]" />
+            {/* Category tag badge */}
+            <div className="mb-3">
+              {active.category === "programming" ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600 text-white text-xs font-black uppercase tracking-wider shadow-md">
+                  <Monitor size={12} />
+                  Pilar Programming
+                </span>
+              ) : active.category === "networking" ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-black uppercase tracking-wider shadow-md">
+                  <Wifi size={12} />
+                  Pilar Networking
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-white text-xs font-bold uppercase tracking-wider shadow-md">
+                  Kegiatan Jurusan
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`w-2 h-2 rounded-full ${active.category === "networking" ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-red-600 shadow-[0_0_8px_#dc2626]"}`} />
               <p
                 className="text-white/70 text-xs sm:text-sm font-extrabold tracking-[0.2em] uppercase"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
@@ -831,29 +915,34 @@ function GallerySection({ gallery }: { gallery: { url: string; alt?: string }[] 
               className="text-white font-extrabold leading-tight tracking-tight drop-shadow-lg"
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: "clamp(1.5rem, 3.5vw, 3.25rem)",
+                fontSize: "clamp(1.5rem, 3.5vw, 3rem)",
                 lineHeight: "1.15",
                 opacity: animating ? 0 : 1,
                 transform: animating ? "translateY(15px)" : "translateY(0)",
                 transition: "opacity 0.4s ease, transform 0.4s ease",
               }}
             >
-              {active.alt || `TJKT #${activeIdx + 1}`}
+              {active.alt || `Aktivitas TJKT #${activeIdx + 1}`}
             </h2>
           </div>
 
-          {/* Dots Pagination (All screens) */}
+          {/* Dots Pagination */}
           <div className="absolute bottom-6 right-6 z-30 flex items-center justify-end gap-1.5 flex-wrap max-w-[60%]">
             {items.map((_, i) => (
               <button
                 key={`dot-${i}`}
+                type="button"
                 onClick={() => switchTo(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${i === activeIdx ? "w-6 bg-white shadow-[0_0_8px_#ffffff]" : "w-1.5 bg-white/40 hover:bg-white/70"}`}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  i === activeIdx
+                    ? "w-7 bg-white shadow-[0_0_8px_#ffffff]"
+                    : "w-1.5 bg-white/40 hover:bg-white/70"
+                }`}
+                title={`Ke foto ${i + 1}`}
               />
             ))}
           </div>
         </div>
-
       </div>
     </section>
   );
@@ -957,6 +1046,17 @@ export default function App() {
   }, []);
 
 
+  const [galleryCategory, setGalleryCategory] = useState<"all" | "programming" | "networking">("all");
+  const [previewAchievement, setPreviewAchievement] = useState<any | null>(null);
+
+  const handleConcentrationClick = (cat: "programming" | "networking") => {
+    setGalleryCategory(cat);
+    const el = document.getElementById("galeri");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   // Fetch dynamic content from Laravel API on mount
   useEffect(() => {
     fetchPublicContent()
@@ -967,13 +1067,18 @@ export default function App() {
             setDynamicTeachers(res.data.teachers);
           }
           if (Array.isArray(res.data.achievements) && res.data.achievements.length > 0) {
-            setDynamicAchievements(res.data.achievements);
+            const mappedAchievements = res.data.achievements.map((a: any) => ({
+              ...a,
+              image: a.image ? resolveImageUrl(a.image) : undefined,
+            }));
+            setDynamicAchievements(mappedAchievements);
           }
           if (Array.isArray(res.data.gallery) && res.data.gallery.length > 0) {
             const mappedGallery = res.data.gallery.map((g: any) => ({
               id: g.id,
-              url: g.url,
-              alt: g.alt || "Gallery Image"
+              url: resolveImageUrl(g.url),
+              alt: g.alt || "Gallery Image",
+              category: g.category || "all",
             }));
             setDynamicGallery(mappedGallery);
           }
@@ -1550,9 +1655,13 @@ export default function App() {
 
             <div className="grid md:grid-cols-2 gap-5">
               {/* Programming - OS window */}
-              <WindowCard title="programming.tjkt - ACTIVE" accent="rgba(220,38,38,0.2)">
+              <WindowCard title="programming.tjkt - ACTIVE (KLIK UNTUK GALERI)" accent="rgba(220,38,38,0.2)">
                 <div className="relative">
-                  <div className="relative h-48 overflow-hidden">
+                  <div
+                    onClick={() => handleConcentrationClick("programming")}
+                    className="relative h-48 overflow-hidden cursor-pointer group/img"
+                    title="Klik untuk membuka galeri kegiatan Programming"
+                  >
                     <img
                       src={resolveImageUrl(siteContent.kompetensiImageProgramming, imgTHP09712)}
                       alt="Lab komputer pemrograman"
@@ -1563,12 +1672,12 @@ export default function App() {
                           e.currentTarget.src = imgTHP09712;
                         }
                       }}
-                      className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
+                      className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-85 dark:group-hover:opacity-50 group-hover/img:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#0e0e10]" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-2xl bg-red-600/20 border border-red-500/30 flex items-center justify-center backdrop-blur-sm">
-                        <Monitor className="text-red-600 dark:text-red-400" size={28} />
+                      <div className="w-16 h-16 rounded-2xl bg-red-600/20 border border-red-500/30 flex items-center justify-center backdrop-blur-sm group-hover/img:scale-110 group-hover/img:bg-red-600 group-hover/img:text-white transition-all duration-300 text-red-600 dark:text-red-400">
+                        <Monitor size={28} />
                       </div>
                     </div>
                   </div>
@@ -1591,15 +1700,24 @@ export default function App() {
                         </div>
                       ))}
                     </div>
+
+                    <div className="mt-6 pt-5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between gap-3">
+                      <span className="text-[11px] text-slate-500 dark:text-zinc-500 font-medium">
+                        Dokumentasi Karya &amp; Praktik
+                      </span>
+                    </div>
                   </div>
                 </div>
               </WindowCard>
 
               {/* Networking - OS window */}
-              <WindowCard title="networking.tjkt - ACTIVE" accent="rgba(16,185,129,0.15)">
-
+              <WindowCard title="networking.tjkt - ACTIVE (KLIK UNTUK GALERI)" accent="rgba(16,185,129,0.15)">
                 <div className="relative">
-                  <div className="relative h-48 overflow-hidden">
+                  <div
+                    onClick={() => handleConcentrationClick("networking")}
+                    className="relative h-48 overflow-hidden cursor-pointer group/img"
+                    title="Klik untuk membuka galeri kegiatan Networking"
+                  >
                     <img
                       src={resolveImageUrl(siteContent.kompetensiImageNetworking, imgTHP09790)}
                       alt="Lab jaringan Cisco MikroTik"
@@ -1610,12 +1728,12 @@ export default function App() {
                           e.currentTarget.src = imgTHP09790;
                         }
                       }}
-                      className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-75 dark:group-hover:opacity-40 transition-opacity duration-500 scale-[1.02]"
+                      className="w-full h-full object-cover opacity-60 dark:opacity-30 group-hover:opacity-85 dark:group-hover:opacity-50 group-hover/img:scale-105 transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#0e0e10]" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center backdrop-blur-sm">
-                        <Wifi className="text-emerald-600 dark:text-emerald-400" size={28} />
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center backdrop-blur-sm group-hover/img:scale-110 group-hover/img:bg-emerald-600 group-hover/img:text-white transition-all duration-300 text-emerald-600 dark:text-emerald-400">
+                        <Wifi size={28} />
                       </div>
                     </div>
                   </div>
@@ -1637,6 +1755,12 @@ export default function App() {
                           <div className="text-slate-500 dark:text-zinc-700 text-[10px] mt-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s}</div>
                         </div>
                       ))}
+                    </div>
+
+                    <div className="mt-6 pt-5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between gap-3">
+                      <span className="text-[11px] text-slate-500 dark:text-zinc-500 font-medium">
+                        Dokumentasi Lab &amp; Infrastruktur
+                      </span> 
                     </div>
                   </div>
                 </div>
@@ -1694,36 +1818,67 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dynamicAchievements.map((p, i) => {
                 const Icon = p.tier === "gold" ? Code : p.tier === "silver" ? Shield : Monitor;
+                const achievementImg = p.image ? resolveImageUrl(p.image) : null;
                 return (
                   <div
                     key={i}
                     className="group relative p-6 rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-300 hover:-translate-y-0.5 overflow-hidden shadow-sm dark:shadow-none"
                   >
                     {p.tier === "gold" && (
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.05] dark:from-yellow-500/[0.03] to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.05] dark:from-yellow-500/[0.03] to-transparent pointer-events-none" />
                     )}
                     <div className="relative">
                       <div className="flex items-center justify-between mb-4">
                         <span
-                          className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-600 bg-slate-100 dark:bg-zinc-900"
+                          className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 bg-slate-100 dark:bg-zinc-900"
                           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                         >
                           {p.year}
                         </span>
                         <TierBadge tier={p.tier} result={p.result} />
                       </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:border-red-500/30 group-hover:bg-red-500/10 dark:group-hover:border-red-500/20 dark:group-hover:bg-red-500/[0.04] transition-all duration-300">
-                          <Icon size={16} className="text-slate-500 dark:text-zinc-500 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300" />
-                        </div>
-                        <div>
-                          <h4 className="text-slate-900 dark:text-white font-bold text-sm leading-snug">{p.event}</h4>
+
+                      <div className="flex items-start gap-3.5">
+                        {achievementImg ? (
+                          <div
+                            onClick={() => setPreviewAchievement(p)}
+                            className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 flex-shrink-0 group/img cursor-pointer shadow-sm bg-slate-100 dark:bg-zinc-800"
+                            title="Klik untuk memperbesar foto bukti juara"
+                          >
+                            <img
+                              src={achievementImg}
+                              alt={p.event}
+                              className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white">
+                              <Eye size={16} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:border-red-500/30 group-hover:bg-red-500/10 dark:group-hover:border-red-500/20 dark:group-hover:bg-red-500/[0.04] transition-all duration-300">
+                            <Icon size={18} className="text-slate-500 dark:text-zinc-500 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-slate-900 dark:text-white font-bold text-sm leading-snug line-clamp-2">
+                            {p.event}
+                          </h4>
                           <div className="flex items-center gap-1.5 mt-1.5">
-                            <Trophy size={11} className="text-slate-400 dark:text-zinc-700" />
-                            <span className="text-xs text-slate-500 dark:text-zinc-600" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            <Trophy size={11} className="text-slate-400 dark:text-zinc-600 flex-shrink-0" />
+                            <span className="text-xs text-slate-500 dark:text-zinc-500 truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                               SMK Tunas Harapan Pati
                             </span>
                           </div>
+                          {achievementImg && (
+                            <button
+                              type="button"
+                              onClick={() => setPreviewAchievement(p)}
+                              className="mt-2 text-[11px] font-semibold text-red-600 dark:text-red-400 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <Eye size={12} />
+                              <span>Lihat Bukti Foto</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1734,8 +1889,12 @@ export default function App() {
           </div>
         </section>
 
-        {/* â”€â”€ GALLERY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <GallerySection gallery={dynamicGallery} />
+        {/* ── GALLERY ────────────────────────────────────────────── */}
+        <GallerySection
+          gallery={dynamicGallery}
+          categoryFilter={galleryCategory}
+          onSelectCategory={setGalleryCategory}
+        />
 
 
         {/* â”€â”€ FACULTY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
@@ -2078,9 +2237,54 @@ export default function App() {
           </div>
         </footer>
 
-        {/* â”€â”€ PPDB: Redirect to external registration site â”€â”€ */}
+        {/* ── ACHIEVEMENT PROOF LIGHTBOX MODAL ── */}
+        {previewAchievement && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fadein"
+            onClick={() => setPreviewAchievement(null)}
+          >
+            <div
+              className="relative max-w-2xl w-full bg-white dark:bg-[#141417] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 sm:p-5 flex items-center justify-between border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02]">
+                <div className="flex items-center gap-3">
+                  <TierBadge tier={previewAchievement.tier} result={previewAchievement.result} />
+                  <span className="text-xs font-mono font-bold text-slate-500 dark:text-zinc-400">
+                    Tahun {previewAchievement.year}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewAchievement(null)}
+                  className="w-8 h-8 rounded-full bg-slate-200/80 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 flex items-center justify-center text-slate-700 dark:text-white transition-colors cursor-pointer"
+                  title="Tutup"
+                >
+                  <X size={16} />
+                </button>
+              </div>
 
-        {/* â”€â”€ KEYFRAMES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+              <div className="relative max-h-[65vh] bg-black/95 flex items-center justify-center overflow-hidden p-2">
+                <img
+                  src={resolveImageUrl(previewAchievement.image)}
+                  alt={previewAchievement.event}
+                  className="w-full h-auto max-h-[62vh] object-contain rounded-lg"
+                />
+              </div>
+
+              <div className="p-5 bg-white dark:bg-[#141417]">
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-snug">
+                  {previewAchievement.event}
+                </h3>
+                <div className="flex items-center gap-2 mt-2 text-xs text-slate-500 dark:text-zinc-400 font-medium">
+                  <Trophy size={14} className="text-amber-500" />
+                  <span>Dokumentasi Penghargaan &amp; Juara · SMK Tunas Harapan Pati</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <style>{`
         @keyframes marquee {
           from { transform: translateX(0); }

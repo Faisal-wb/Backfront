@@ -1,6 +1,41 @@
 // React Frontend API Integration Service with Laravel Backend & Fallback
 
-export const API_BASE_URL = 'https://lt3tjkt.smkthpati.sch.id/api';
+export const API_BASE_URL = 
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? '/api'
+    : 'https://lt3tjkt.smkthpati.sch.id/api');
+
+/**
+ * Universal image URL resolver for uploaded assets, local assets, and remote URLs
+ */
+export function resolveImageUrl(path: string | undefined | null, defaultImg = ""): string {
+  if (!path) return defaultImg;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:") || path.startsWith("blob:")) {
+    return path;
+  }
+
+  // If running in dev with relative '/api'
+  if (API_BASE_URL.startsWith("/")) {
+    if (path.startsWith("/api/")) return path;
+    if (path.startsWith("/storage/")) return `/api${path}`;
+    if (path.startsWith("/")) return path;
+    return `/${path}`;
+  }
+
+  // If pointing to full remote backend
+  const cleanDomain = API_BASE_URL.replace(/\/api\/?$/, "");
+  if (path.startsWith("/api/")) {
+    return `${cleanDomain}${path}`;
+  }
+  if (path.startsWith("/storage/")) {
+    return `${cleanDomain}/api${path}`;
+  }
+  if (path.startsWith("/")) {
+    return `${cleanDomain}${path}`;
+  }
+  return `${cleanDomain}/${path}`;
+}
 
 export interface StatItem {
   id?: number;
@@ -27,14 +62,16 @@ export interface AchievementItem {
   result: string;
   tier: "gold" | "silver" | "bronze";
   year: string;
-  icon: string;
+  icon?: string;
+  image?: string;
 }
 
 export interface GalleryItemData {
   id?: number;
   url: string;
   alt: string;
-  tall: boolean;
+  category?: "programming" | "networking" | "all";
+  tall?: boolean;
 }
 
 export interface TeacherItem {
@@ -65,9 +102,8 @@ export interface ContactPayload {
  * Fetch dynamic content from Laravel API with fallback logic
  */
 export async function fetchPublicContent() {
-  // Abort after 3 seconds to fail fast and use local fallback
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
 
   try {
     const response = await fetch(`${API_BASE_URL}/content`, {
@@ -215,7 +251,7 @@ export async function adminLogout() {
  */
 export async function fetchSiteContentApi() {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const timeoutId = setTimeout(() => controller.abort(), 4000);
 
   try {
     const response = await fetch(`${API_BASE_URL}/site-content`, {
@@ -302,7 +338,7 @@ export async function saveSiteContentApi(data: any) {
 /**
  * Admin Gallery API
  */
-export async function adminGalleryApi(method: string, id: number | null, data: FormData | object) {
+export async function adminGalleryApi(method: string, id: number | null, data?: FormData | object) {
   const token = localStorage.getItem('tjkt_admin_token');
   const url = id ? `${API_BASE_URL}/admin/gallery/${id}` : `${API_BASE_URL}/admin/gallery`;
 
@@ -316,22 +352,27 @@ export async function adminGalleryApi(method: string, id: number | null, data: F
     headers,
   };
 
-  if (data instanceof FormData) {
-    options.body = data;
-    // Don't set Content-Type for FormData, browser will set it with boundary
-  } else {
-    headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(data);
+  if (method !== 'DELETE' && method !== 'GET' && data) {
+    if (data instanceof FormData) {
+      options.body = data;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(data);
+    }
   }
 
   const response = await fetch(url, options);
-  return await response.json();
+  try {
+    return await response.json();
+  } catch {
+    return { status: response.ok ? 'success' : 'error' };
+  }
 }
 
 /**
  * Admin Teachers API
  */
-export async function adminTeachersApi(method: string, id: number | null, data: FormData | object) {
+export async function adminTeachersApi(method: string, id: number | null, data?: FormData | object) {
   const token = localStorage.getItem('tjkt_admin_token');
   const url = id ? `${API_BASE_URL}/admin/teachers/${id}` : `${API_BASE_URL}/admin/teachers`;
 
@@ -345,32 +386,53 @@ export async function adminTeachersApi(method: string, id: number | null, data: 
     headers,
   };
 
-  if (data instanceof FormData) {
-    options.body = data;
-  } else {
-    headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(data);
+  if (method !== 'DELETE' && method !== 'GET' && data) {
+    if (data instanceof FormData) {
+      options.body = data;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(data);
+    }
   }
 
   const response = await fetch(url, options);
-  return await response.json();
+  try {
+    return await response.json();
+  } catch {
+    return { status: response.ok ? 'success' : 'error' };
+  }
 }
 
 /**
  * Admin Achievements API
  */
-export async function adminAchievementsApi(method: string, id: number | null, data: object) {
+export async function adminAchievementsApi(method: string, id: number | null, data?: FormData | object) {
   const token = localStorage.getItem('tjkt_admin_token');
   const url = id ? `${API_BASE_URL}/admin/achievements/${id}` : `${API_BASE_URL}/admin/achievements`;
 
-  const response = await fetch(url, {
+  const headers: any = {
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+
+  const options: RequestInit = {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(data),
-  });
-  return await response.json();
+    headers,
+  };
+
+  if (method !== 'DELETE' && method !== 'GET' && data) {
+    if (data instanceof FormData) {
+      options.body = data;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(data);
+    }
+  }
+
+  const response = await fetch(url, options);
+  try {
+    return await response.json();
+  } catch {
+    return { status: response.ok ? 'success' : 'error' };
+  }
 }

@@ -61,6 +61,14 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
   const [uploading, setUploading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<TeacherData | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    if (Array.isArray(propTeachers) && propTeachers.length > 0) {
+      setTeachers(propTeachers);
+    }
+  }, [propTeachers]);
 
   const [formData, setFormData] = useState<{ file: File | null; data: TeacherData }>({
     file: null,
@@ -108,19 +116,27 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (index: number) => {
-    const item = teachers[index];
-    if (window.confirm(`Yakin ingin menghapus guru ${item.name}?`)) {
-      if (item.id) {
-        try {
-          await adminTeachersApi('DELETE', item.id, {});
-        } catch (e) {
-          console.error("Failed to delete from server", e);
-        }
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const target = deleteTarget;
+    setIsDeleting(true);
+
+    if (target.id) {
+      try {
+        await adminTeachersApi('DELETE', target.id);
+      } catch (e) {
+        console.error("Failed to delete from server", e);
       }
-      const updated = teachers.filter((_, i) => i !== index);
-      setTeachers(updated);
     }
+
+    const updated = teachers.filter((t) => {
+      if (target.id && t.id) return t.id !== target.id;
+      return t !== target;
+    });
+
+    setTeachers(updated);
+    setIsDeleting(false);
+    setDeleteTarget(null);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -291,7 +307,8 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(idx)}
+                  type="button"
+                  onClick={() => setDeleteTarget(t)}
                   className="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs transition-colors cursor-pointer flex items-center gap-1.5 font-semibold"
                 >
                   <Trash2 size={14} />
@@ -396,6 +413,79 @@ export const AdminTeachers: React.FC<AdminTeachersProps> = ({ teachers: propTeac
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL KONFIRMASI HAPUS GURU */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fadein">
+          <div className={`w-full max-w-sm border rounded-2xl p-6 shadow-2xl space-y-4 ${
+            isDark ? "bg-[#18181b] border-zinc-800 text-white" : "bg-white border-slate-200 text-slate-900"
+          }`}>
+            <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/50 flex items-center justify-center shrink-0">
+                <Trash2 size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-base leading-snug">Hapus Data Guru?</h3>
+                <p className={`text-xs ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Tindakan ini tidak dapat dibatalkan</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-xl border bg-slate-50 dark:bg-zinc-900/60 border-slate-200 dark:border-zinc-800">
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-200 dark:bg-zinc-800 shrink-0">
+                {deleteTarget.image ? (
+                  <img
+                    src={deleteTarget.image?.startsWith('/') ? `https://lt3tjkt.smkthpati.sch.id${deleteTarget.image}` : deleteTarget.image}
+                    alt={deleteTarget.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center text-white font-bold"
+                    style={{ backgroundColor: deleteTarget.color || "#059669" }}
+                  >
+                    {deleteTarget.initials}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-xs text-slate-900 dark:text-white truncate">{deleteTarget.name}</p>
+                <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">{deleteTarget.role}</p>
+              </div>
+            </div>
+
+            <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
+              Data guru ini akan dihapus permanen dari database MySQL dan website publik TJKT.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                  isDark ? "border-zinc-700 hover:bg-zinc-800 text-zinc-300" : "border-slate-200 hover:bg-slate-100 text-slate-700"
+                }`}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <span>Menghapus...</span>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>Ya, Hapus Guru</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
