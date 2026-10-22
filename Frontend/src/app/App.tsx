@@ -858,28 +858,7 @@ function GallerySection({
             }}
           />
 
-          {/* Dark gradient overlay for text legibility */}
-          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/15 to-black/40 pointer-events-none" />
-
-          {/* Prev / Next controls */}
-          <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 z-30 flex items-center justify-between pointer-events-none">
-            <button
-              type="button"
-              onClick={() => switchTo((activeIdx - 1 + items.length) % items.length)}
-              className="w-11 h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 text-white flex items-center justify-center pointer-events-auto backdrop-blur-md transition-all hover:scale-110 cursor-pointer shadow-xl"
-              title="Foto Sebelumnya"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <button
-              type="button"
-              onClick={() => switchTo((activeIdx + 1) % items.length)}
-              className="w-11 h-11 rounded-full bg-black/60 hover:bg-red-600 border border-white/20 text-white flex items-center justify-center pointer-events-auto backdrop-blur-md transition-all hover:scale-110 cursor-pointer shadow-xl"
-              title="Foto Selanjutnya"
-            >
-              <ChevronRight size={22} />
-            </button>
-          </div>
+         
 
           {/* Title text at bottom-left */}
           <div className="absolute bottom-0 left-0 z-20 p-6 sm:p-10 md:p-12 max-w-3xl">
