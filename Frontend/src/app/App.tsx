@@ -179,8 +179,8 @@ function Tag({ label, green, red }: { label: string; green?: boolean; red?: bool
       className={`inline-block px-3 py-1 rounded-full text-xs border transition-colors duration-200 ${green
         ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/8 dark:text-emerald-400 hover:bg-emerald-500/20"
         : red
-        ? "border-red-500/30 bg-red-500/10 text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-400 hover:bg-red-500/20"
-        : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-white/20"
+          ? "border-red-500/30 bg-red-500/10 text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-400 hover:bg-red-500/20"
+          : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-white/20"
         }`}
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
@@ -776,22 +776,20 @@ function GallerySection({
           <button
             type="button"
             onClick={() => onSelectCategory("all")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-              categoryFilter === "all"
-                ? "bg-white text-black shadow-md font-black"
-                : "text-zinc-300 hover:text-white hover:bg-white/10"
-            }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${categoryFilter === "all"
+              ? "bg-white text-black shadow-md font-black"
+              : "text-zinc-300 hover:text-white hover:bg-white/10"
+              }`}
           >
             Semua ({gallery.length})
           </button>
           <button
             type="button"
             onClick={() => onSelectCategory("programming")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              categoryFilter === "programming"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/40 font-black"
-                : "text-zinc-300 hover:text-red-400 hover:bg-white/10"
-            }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${categoryFilter === "programming"
+              ? "bg-red-600 text-white shadow-md shadow-red-600/40 font-black"
+              : "text-zinc-300 hover:text-red-400 hover:bg-white/10"
+              }`}
           >
             <Monitor size={13} />
             <span>Programming ({gallery.filter((g) => g.category === "programming").length})</span>
@@ -799,11 +797,10 @@ function GallerySection({
           <button
             type="button"
             onClick={() => onSelectCategory("networking")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              categoryFilter === "networking"
-                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/40 font-black"
-                : "text-zinc-300 hover:text-emerald-400 hover:bg-white/10"
-            }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${categoryFilter === "networking"
+              ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/40 font-black"
+              : "text-zinc-300 hover:text-emerald-400 hover:bg-white/10"
+              }`}
           >
             <Wifi size={13} />
             <span>Networking ({gallery.filter((g) => g.category === "networking").length})</span>
@@ -858,7 +855,7 @@ function GallerySection({
             }}
           />
 
-         
+
 
           {/* Title text at bottom-left */}
           <div className="absolute bottom-0 left-0 z-20 p-6 sm:p-10 md:p-12 max-w-3xl">
@@ -912,11 +909,10 @@ function GallerySection({
                 key={`dot-${i}`}
                 type="button"
                 onClick={() => switchTo(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  i === activeIdx
-                    ? "w-7 bg-white shadow-[0_0_8px_#ffffff]"
-                    : "w-1.5 bg-white/40 hover:bg-white/70"
-                }`}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${i === activeIdx
+                  ? "w-7 bg-white shadow-[0_0_8px_#ffffff]"
+                  : "w-1.5 bg-white/40 hover:bg-white/70"
+                  }`}
                 title={`Ke foto ${i + 1}`}
               />
             ))}
@@ -959,9 +955,9 @@ export default function App() {
   const [isAdminView, setIsAdminView] = useState(() =>
     typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.hash === "#admin")
   );
-  const [isAdminLogged, setIsAdminLogged] = useState(() => 
-    typeof window !== "undefined" && 
-    Boolean(localStorage.getItem("tjkt_admin_token")) && 
+  const [isAdminLogged, setIsAdminLogged] = useState(() =>
+    typeof window !== "undefined" &&
+    Boolean(localStorage.getItem("tjkt_admin_token")) &&
     localStorage.getItem("tjkt_admin_logged") === "true"
   );
 
@@ -1739,7 +1735,7 @@ export default function App() {
                     <div className="mt-6 pt-5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between gap-3">
                       <span className="text-[11px] text-slate-500 dark:text-zinc-500 font-medium">
                         Dokumentasi Lab &amp; Infrastruktur
-                      </span> 
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -2067,7 +2063,7 @@ export default function App() {
                   href="https://ppdb.smkthpati.sch.id/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-white text-red-700 font-black text-base hover:bg-red-50 hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transition-all duration-200 group"
+                  className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-red-600 text-white font-black text-base hover:bg-red-50 hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transition-all duration-200 group"
                 >
                   Daftar PPDB Sekarang
                   <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
@@ -2176,32 +2172,64 @@ export default function App() {
               {/* Map placeholder — 3 cols */}
               <div className="md:col-span-3">
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Lokasi</h4>
-                <div className="relative w-full h-56 rounded-xl overflow-hidden border border-white/10 shadow-md group">
-                  <iframe
-                    title="Lokasi SMK Tunas Harapan Pati"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.138356983802!2d111.0427843!3d-6.7530182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e70d313a5b1129d%3A0xde1baf5be57d6a4f!2sSMK%20Tunas%20Harapan%20Pati!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(120%)" }}
-                    allowFullScreen={false}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="w-full h-full pointer-events-none opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                  <a
-                    href="https://www.google.com/maps/search/?api=1&query=SMK+Tunas+Harapan+Pati"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute inset-0 bg-black/40 group-hover:bg-black/20 flex flex-col items-center justify-center gap-1 transition-all duration-300 cursor-pointer p-2"
-                  >
-                    <div className="flex items-center gap-1.5 bg-zinc-900/90 border border-white/10 px-3 py-1.5 rounded-lg group-hover:border-red-500/50 group-hover:scale-105 transition-all duration-300">
-                      <MapPin size={16} className="text-red-500" />
-                      <span className="text-white text-xs font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        SMK Tunas Harapan Pati ↗
-                      </span>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=SMK+Tunas+Harapan+Pati"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative w-full h-56 rounded-2xl overflow-hidden border border-white/10 hover:border-red-500/40 shadow-xl group block transition-all duration-300 bg-[#0d0d10] cursor-pointer"
+                >
+                  {/* Stylized Dark Vector Map Grid & Roads */}
+                  <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-500">
+                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="footer-map-grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                          <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#footer-map-grid)" />
+                      {/* Stylized road network */}
+                      <path d="M -20 80 Q 80 120 180 90 T 380 140" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="3" />
+                      <path d="M 120 -20 L 140 240" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="4" />
+                      <path d="M 30 200 Q 150 140 320 180" fill="none" stroke="rgba(239,68,68,0.25)" strokeWidth="2.5" strokeDasharray="4 4" />
+                      <path d="M 220 -20 Q 200 100 280 240" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
+                    </svg>
+                  </div>
+
+                  {/* Gradient overlays */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 pointer-events-none" />
+
+                  {/* Animated Radar Pulse at Center Pin */}
+                  <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                    <span className="absolute w-16 h-16 rounded-full bg-red-500/20 animate-ping opacity-60" />
+                    <span className="absolute w-10 h-10 rounded-full bg-red-600/30 animate-pulse" />
+                    <div className="relative w-8 h-8 rounded-full bg-red-600 border-2 border-white flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.8)]">
+                      <MapPin size={16} className="text-white" />
                     </div>
-                  </a>
-                </div>
+                  </div>
+
+                  {/* Top Badge: Coordinates */}
+                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-[9px] font-mono text-zinc-400">
+                    6.7530° S, 111.0428° E
+                  </div>
+
+                  {/* Bottom Info & Action CTA */}
+                  <div className="absolute bottom-3 inset-x-3 p-3 rounded-xl bg-zinc-950/80 backdrop-blur-md border border-white/10 flex items-center justify-between gap-2 group-hover:border-red-500/50 transition-all duration-300">
+                    <div className="min-w-0">
+                      <div className="text-white text-xs font-bold truncate flex items-center gap-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                        SMK Tunas Harapan Pati
+                      </div>
+                      <div className="text-zinc-400 text-[10px] truncate mt-0.5">
+                        Jl. Raya Pati - Tayu KM. 4
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold shrink-0 transition-colors shadow-sm">
+                      <span>Buka Maps</span>
+                      <ExternalLink size={11} />
+                    </span>
+                  </div>
+                </a>
               </div>
             </div>
 
