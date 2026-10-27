@@ -179,8 +179,8 @@ function Tag({ label, green, red }: { label: string; green?: boolean; red?: bool
       className={`inline-block px-3 py-1 rounded-full text-xs border transition-colors duration-200 ${green
         ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/8 dark:text-emerald-400 hover:bg-emerald-500/20"
         : red
-          ? "border-red-500/30 bg-red-500/10 text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-400 hover:bg-red-500/20"
-          : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-white/20"
+        ? "border-red-500/30 bg-red-500/10 text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-400 hover:bg-red-500/20"
+        : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400 dark:hover:border-white/20"
         }`}
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
@@ -776,20 +776,22 @@ function GallerySection({
           <button
             type="button"
             onClick={() => onSelectCategory("all")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${categoryFilter === "all"
-              ? "bg-white text-black shadow-md font-black"
-              : "text-zinc-300 hover:text-white hover:bg-white/10"
-              }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              categoryFilter === "all"
+                ? "bg-white text-black shadow-md font-black"
+                : "text-zinc-300 hover:text-white hover:bg-white/10"
+            }`}
           >
             Semua ({gallery.length})
           </button>
           <button
             type="button"
             onClick={() => onSelectCategory("programming")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${categoryFilter === "programming"
-              ? "bg-red-600 text-white shadow-md shadow-red-600/40 font-black"
-              : "text-zinc-300 hover:text-red-400 hover:bg-white/10"
-              }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              categoryFilter === "programming"
+                ? "bg-red-600 text-white shadow-md shadow-red-600/40 font-black"
+                : "text-zinc-300 hover:text-red-400 hover:bg-white/10"
+            }`}
           >
             <Monitor size={13} />
             <span>Programming ({gallery.filter((g) => g.category === "programming").length})</span>
@@ -797,10 +799,11 @@ function GallerySection({
           <button
             type="button"
             onClick={() => onSelectCategory("networking")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${categoryFilter === "networking"
-              ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/40 font-black"
-              : "text-zinc-300 hover:text-emerald-400 hover:bg-white/10"
-              }`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              categoryFilter === "networking"
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/40 font-black"
+                : "text-zinc-300 hover:text-emerald-400 hover:bg-white/10"
+            }`}
           >
             <Wifi size={13} />
             <span>Networking ({gallery.filter((g) => g.category === "networking").length})</span>
@@ -855,7 +858,7 @@ function GallerySection({
             }}
           />
 
-
+         
 
           {/* Title text at bottom-left */}
           <div className="absolute bottom-0 left-0 z-20 p-6 sm:p-10 md:p-12 max-w-3xl">
@@ -909,10 +912,11 @@ function GallerySection({
                 key={`dot-${i}`}
                 type="button"
                 onClick={() => switchTo(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${i === activeIdx
-                  ? "w-7 bg-white shadow-[0_0_8px_#ffffff]"
-                  : "w-1.5 bg-white/40 hover:bg-white/70"
-                  }`}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  i === activeIdx
+                    ? "w-7 bg-white shadow-[0_0_8px_#ffffff]"
+                    : "w-1.5 bg-white/40 hover:bg-white/70"
+                }`}
                 title={`Ke foto ${i + 1}`}
               />
             ))}
@@ -955,9 +959,9 @@ export default function App() {
   const [isAdminView, setIsAdminView] = useState(() =>
     typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.hash === "#admin")
   );
-  const [isAdminLogged, setIsAdminLogged] = useState(() =>
-    typeof window !== "undefined" &&
-    Boolean(localStorage.getItem("tjkt_admin_token")) &&
+  const [isAdminLogged, setIsAdminLogged] = useState(() => 
+    typeof window !== "undefined" && 
+    Boolean(localStorage.getItem("tjkt_admin_token")) && 
     localStorage.getItem("tjkt_admin_logged") === "true"
   );
 
@@ -1735,7 +1739,7 @@ export default function App() {
                     <div className="mt-6 pt-5 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between gap-3">
                       <span className="text-[11px] text-slate-500 dark:text-zinc-500 font-medium">
                         Dokumentasi Lab &amp; Infrastruktur
-                      </span>
+                      </span> 
                     </div>
                   </div>
                 </div>
@@ -2063,7 +2067,7 @@ export default function App() {
                   href="https://ppdb.smkthpati.sch.id/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-red-600 text-white font-black text-base hover:bg-red-50 hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transition-all duration-200 group"
+                  className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-white text-red-700 font-black text-base hover:bg-red-50 hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transition-all duration-200 group"
                 >
                   Daftar PPDB Sekarang
                   <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
